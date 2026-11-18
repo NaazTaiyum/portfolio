@@ -53,17 +53,19 @@ export default function Photography() {
     (target && target !== document.body && target.isConnected ? target : title.current)?.focus({ preventScroll: true });
   }
 
+  if (!photos.length) return <div className="mx-auto max-w-[1120px] space-y-3">
+    <h1>Photography</h1><p className="text-muted">Photos coming soon</p>
+  </div>;
+
   return <div className="mx-auto max-w-[1120px] space-y-7">
     <header className="space-y-3 border-b border-line pb-6">
       <p className={label}>Photography</p>
       <h1 ref={title} tabIndex={-1}>Through the lens</h1>
-      <p className="text-muted">Wrocław in every season, places I've travelled and the corners where the work happens. All photos are my own.</p>
     </header>
     <FilterChips name="Photo categories" value={category}
       options={categories.map(item => ({value: item.value, label: `${item.label} (${item.value === 'all' ? photos.length : photos.filter(photo => photo.category === item.value).length})`}))}
       onChange={value => setParams({ c: value })} />
-    {!photos.length ? <p className="text-muted">Photos coming soon.</p> :
-      !filtered.length ? <p className="text-muted">No photos in this category yet.</p> : null}
+    {!filtered.length ? <p className="text-muted">No photos in this category yet.</p> : null}
     {featured && <button type="button" className={panel + ' relative block w-full overflow-hidden text-left'}
       onClick={event => {
         returnFocus.current = event.currentTarget;
