@@ -100,7 +100,7 @@ export const experience: { role: string; org: string; dates?: string; points: st
 ];
 
 export const certifications = [
-  { title: 'Certificate of Participation', issuer: 'UNESCO Youth Hackathon 2026', date: '24 Oct 2026', note: 'Team project on “Play Your Part: Youth Designing the Future of Media and Information Literacy.”', group: 'Competitions' },
+  { title: 'Certificate of Participation', issuer: 'UNESCO Youth Hackathon 2026', date: '24 Oct 2026', note: 'Team project on “Play Your Part: Youth Designing the Future of Media and Information Literacy.”' },
 ];
 
 export const skills = {
@@ -118,6 +118,3 @@ export const languages = [
   { skill: 'English spoken interaction', level: 'C1' },
   { skill: 'English writing', level: 'C1' },
 ];
-
-// Removed once the CV uses the certification and leadership sections.
-export const honors: { title: string; date: string }[] = [];
