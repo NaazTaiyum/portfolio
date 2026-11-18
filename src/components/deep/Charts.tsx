@@ -184,3 +184,22 @@ export function RangeBars({ title, max, rows, caption }: Extract<Block, {kind: '
     </Graphic>
   </Chart>;
 }
+
+export function ContainmentGrid({ title, headers, rows }: Extract<Block, {kind: 'containment'}>) {
+  return <figure className={panel + ' min-w-0 space-y-3 p-3 sm:p-4'}>
+    <figcaption className="font-heading text-xl">{title}</figcaption>
+    <p className="text-xs text-muted">Each cell shows mean episode reward and containment rate.</p>
+    <table className="w-full table-fixed border-separate border-spacing-1 text-center text-xs">
+      <thead><tr>
+        <th scope="col" className="text-left">Network</th>
+        {headers.map(header => <th scope="col" key={header} className="wrap-anywhere font-semibold">{header}</th>)}
+      </tr></thead>
+      <tbody>{rows.map(row => <tr key={row.label}>
+        <th scope="row" className="text-left font-semibold">{row.label}</th>
+        {row.values.map((value, index) => <td key={headers[index]} className={'rounded py-2 font-mono ' + (row.containment[index] ? 'bg-teal/15' : 'bg-coral/15')}>
+          {value.toFixed(1)}<span className="block">{row.containment[index] ? '100%' : '0%'}</span>
+        </td>)}
+      </tr>)}</tbody>
+    </table>
+  </figure>;
+}

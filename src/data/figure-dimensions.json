@@ -14,5 +14,21 @@
   "projects/federated-ids/flowchart.png": {
     "width": 1449,
     "height": 1114
+  },
+  "projects/cyber-defense-generalization/architecture_diagram.png": {
+    "width": 2579,
+    "height": 1779
+  },
+  "projects/cyber-defense-generalization/multiseed_chart.png": {
+    "width": 2000,
+    "height": 1200
+  },
+  "projects/physics-residual-aqa/figure_1_requirement.png": {
+    "width": 1600,
+    "height": 900
+  },
+  "projects/physics-residual-aqa/figure_2_reality.png": {
+    "width": 1600,
+    "height": 900
   }
 }

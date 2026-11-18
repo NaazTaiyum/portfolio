@@ -37,8 +37,8 @@ export default function Home() {
     <section><SectionHeading>Research questions</SectionHeading><Interests /></section>
     <section>
       <div className="flex flex-wrap justify-between gap-2"><SectionHeading>Featured work</SectionHeading><Link to="/projects">All projects →</Link></div>
-      <div className="grid gap-4 md:grid-cols-2">{publishedProjects.filter(project => project.featured).map(project =>
-        <ProjectCard key={project.slug} project={project} variant="featured" />)}</div>
+      <div className="grid gap-4 lg:grid-cols-[1.4fr_1fr]">{publishedProjects.filter(project => project.featured).map((project, index) =>
+        <ProjectCard key={project.slug} project={project} variant="featured" placement={index === 0 ? 'lead' : 'support'} />)}</div>
     </section>
     <section><SectionHeading>Latest preprint</SectionHeading><CitationCard publication={publications[0]} /></section>
     <section className={panel + ' p-5'}><SectionHeading>Now, Nov 2026</SectionHeading>

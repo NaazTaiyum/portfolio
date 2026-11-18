@@ -27,7 +27,7 @@ export function DeepDetail({ project, content, previous, next }: {project: Proje
     </nav>
     <header className="space-y-4 border-y border-line py-6 sm:py-8">
       <div className="flex flex-wrap items-center gap-2">
-        <StatusPill>{project.status} · {project.dates}</StatusPill>
+        <StatusPill>{project.status}{project.dates && ` · ${project.dates}`}</StatusPill>
         <Tags values={project.tags} />
         {content.badges?.map(badge => <span className="rounded border border-coral/40 bg-card px-2 py-1 font-mono text-xs text-coral" key={badge}>{badge}</span>)}
       </div>
@@ -36,7 +36,9 @@ export function DeepDetail({ project, content, previous, next }: {project: Proje
       <p className="text-sm text-muted">{project.role}{project.collaborators && <> · {project.collaborators}</>}</p>
       <div className="flex flex-wrap gap-2">{links.map(link => <Button key={link.href} href={link.href} variant={link === primary ? 'primary' : 'secondary'}>
         {link.kind === 'paper' ? 'Read the preprint' : link.label}
-      </Button>)}</div>
+      </Button>)}
+        {project.pendingPaper && <button type="button" disabled className="rounded-full border border-line px-3 py-2 text-sm text-muted">{project.pendingPaper}</button>}
+      </div>
     </header>
     {!!content.metrics.length && <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">{content.metrics.map(metric => <MetricCard key={metric.label} metric={metric} />)}</dl>}
     {content.artifact && <section className={panel + ' space-y-4 p-3 [content-visibility:auto] [contain-intrinsic-size:auto_400px] sm:p-5'}>
