@@ -34,13 +34,13 @@ jobs:
           npm run preview -- --host 127.0.0.1 --port 4173 --strictPort > /tmp/portfolio-preview.log 2>&1 &
           if ! curl --fail --silent --show-error --output /dev/null \
             --connect-timeout 2 --max-time 3 --retry 15 --retry-connrefused --retry-delay 1 \
-            http://127.0.0.1:4173/portfolio_web/; then
+            http://127.0.0.1:4173/portfolio/; then
             cat /tmp/portfolio-preview.log
             exit 1
           fi
       - uses: lycheeverse/lychee-action@v2
         with:
-          args: --no-progress --scheme http --scheme https --include '^http://127\.0\.0\.1:4173/portfolio_web/' --base-url http://127.0.0.1:4173/portfolio_web/ 'dist/**/*.html'
+          args: --no-progress --scheme http --scheme https --include '^http://127\.0\.0\.1:4173/portfolio/' --base-url http://127.0.0.1:4173/portfolio/ 'dist/**/*.html'
           fail: true
       - uses: actions/upload-pages-artifact@v3
         with:
