@@ -43,10 +43,13 @@ export function XYPlot({ kind, title, xLabel, yLabel, xTicks, yTicks, points, ca
       {plotted.map(point => <g key={point.label}>
         <circle cx={point.px} cy={point.py} r="5.5" fill={colors[point.tone ?? 'primary']} />
         <text x={point.px + (point.px > 315 ? -8 : 8)} y={Math.max(23, point.py - (point.tone === 'coral' ? 16 : 9))} textAnchor={point.px > 315 ? 'end' : 'start'} fill={text}>
-          {kind === 'line' ? `${point.y}% · ${point.note}` : point.label}
+          {kind === 'line' ? point.y : point.label}
         </text>
       </g>)}
     </Graphic>
+    {kind === 'line' && points.some(point => point.note) && <ul aria-label="Chart annotations" className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted">
+      {points.map(point => point.note && <li key={point.label}>{point.label} · {point.note}</li>)}
+    </ul>}
   </Chart>;
 }
 

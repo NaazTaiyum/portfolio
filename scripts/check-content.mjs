@@ -14,28 +14,29 @@ async function readData(path) {
   return import('data:text/javascript;base64,' + Buffer.from(compiled.outputText).toString('base64'));
 }
 
-const [{ projects }, { experience }] = await Promise.all([
+const [{ projects }, { conferences, experience }, { deepProjects }] = await Promise.all([
   readData('../src/data/projects.ts'),
   readData('../src/data/site.ts'),
+  readData('../src/data/deep.ts'),
 ]);
 
 const prohibited = new Set([
-  'Nowak', 'Connectomics & NeuroAI Group', '2504.09112', 'ISRC Paper #', 'hpo-scale-0844',
-  'zenodo.10842911', 'CK-0411', 'uni-wroc.pl', '99.82', 'cryptographic session',
-  '0009-0000-0000-0000', 'example.edu', 'Fall 2025', 'Distributed Checkpointing',
-  'Neural Vector Field', 'doctoral tenure', 'Telemetry Normal', '918239', 'Lustre',
-  '[to fill]', 'UK Biobank', 'ALAN-NeuroNet', '47K', 'In Press', 'IN PRESS', 'Pan-Cancer',
-  'RICA', '577 758 192',
-  '24,000', 'World Aquatics', 'Hanavan', 'Diving48', 'PINN',
-  'Physics-Informed Neural Network', 'Wilson-Cowan', '20,000 angular', 'PSD surface',
-  '1.8°', '32% more', 'ASHA', 'WAL', 'Polars', 'Appainer', 'Apptainer', 'ghcr.io',
-  'RFC 5545', 'CalDAV', 'AES-256', 'TxID', 'Determinism Score', '#CK-', 'ARCH-LOG',
-  'Monte Carlo', 'p < 0.001', 'Hugging Face Trial', 'carbon', 'Oct 2024 – May 2025',
-  'Sep 2024 – Sep 2026', 'Jan 2024 – Nov 2024', 'May 2024 – Oct 2024',
-  'Gaussian Processes', 'neuroglancer', 'NetworkX', 'JAX',
+  '1644197272', 'Uttar Bagmara', 'Kotbari', '3503', '1717671744', 'tofael@cou.ac.bd',
+  '577 758 192', 'ali.ashraf.yad01', 'qoNVckcAAAAJ', 'md-ali-ashraf-y', 'ICCIT',
+  'ConnectomeTwin', 'ZEN_OS', 'ClimateGuard', 'Trust but Verify', 'ADNI', 'pl0844-01',
+  'Wrocław · CS & NeuroAI', 'Yad_CV_Research', 'https://github.com/donti507"',
+  '100% accuracy', '100.00%',
   ...projects.filter(entry => entry.verify).flatMap(entry => [entry.title, entry.shortTitle, entry.slug]),
+  ...conferences.filter(entry => entry.verify).flatMap(entry => [entry.title, entry.venue, entry.now].filter(Boolean)),
   ...experience.filter(entry => entry.verify).map(entry => entry.role),
+  ...Object.values(deepProjects).flatMap(project => project.sections.filter(section => section.verify)
+    .flatMap(section => section.blocks.flatMap(block => block.kind === 'steps' ? block.items.map(item => item.body) : []))),
 ]);
+
+const formerName = 'Md Ali Ashraf Yad';
+const allowedAttributions = [
+  'Collaborator: Md Ali Ashraf Yad (Wrocław University of Science and Technology), first author: study design and comparison pipeline',
+];
 
 const publicPhotos = fileURLToPath(new URL('../public/photos/', import.meta.url));
 const music = JSON.parse(await readFile(new URL('../src/data/music.json', import.meta.url), 'utf8'));
@@ -99,10 +100,15 @@ async function scan(directory) {
     } else if (entry.isFile()) {
       const contents = await readFile(path);
       if (entry.name === 'index.html' || contents.length) count++;
-      // Generated media is binary. Match forbidden text in the rest of the build.
-      if (/^(photos\/.*\.webp|music\/.*\.mp3)$/i.test(builtPath)) continue;
+      // Also inspect filenames, including those of binary assets.
+      const text = /\.(?:png|webp|jpe?g|gif|woff2?|mp3)$/i.test(builtPath) ? '' : contents.toString('utf8');
       for (const value of prohibited) {
-        if (contents.includes(value)) failures.push(`${relative(output, path)}: ${value}`);
+        if (text.includes(value) || builtPath.includes(value)) failures.push(`${builtPath}: prohibited content`);
+      }
+      const withoutAttribution = allowedAttributions.reduce((remaining, attribution) =>
+        remaining.replaceAll(attribution, ''), text);
+      if (withoutAttribution.includes(formerName) || builtPath.includes(formerName)) {
+        failures.push(`${builtPath}: unexpected collaborator name`);
       }
     }
   }

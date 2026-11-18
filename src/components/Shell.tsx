@@ -1,10 +1,12 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
-import { Github, GraduationCap, Mail, Menu, Moon, Sun, X } from 'lucide-react';
+import { Github, Mail, Menu, Moon, Sun, X } from 'lucide-react';
 import { Link, NavLink } from 'react-router-dom';
 import { person } from '../data/site';
 import { asset, hasAsset } from '../data/assets';
 import tracks from '../data/music.json';
 import { youtubeTracks } from "../data/youtube-music";
+
+import { photos } from '../data/photos';
 
 const MusicPlayer = lazy(() => import('./MusicPlayer'));
 
@@ -45,7 +47,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
   const themeLabel = theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme';
   const themeButton = <button type="button" className="p-2 text-ink" aria-label={themeLabel} title={themeLabel} onClick={toggleTheme}>
     {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}</button>;
-  const links = navigation.map(([name, to]) => <NavLink key={to} to={to} end={to === '/'}
+  const links = navigation.filter(([name]) => name !== 'Photography' || photos.length > 0).map(([name, to]) => <NavLink key={to} to={to} end={to === '/'}
     onClick={() => menu.current?.close()}
     className="py-2 text-ink aria-[current=page]:text-primary aria-[current=page]:underline decoration-2 underline-offset-8">{name}</NavLink>);
   return <div className="flex min-h-screen flex-col">
@@ -54,28 +56,28 @@ export function Shell({ children }: { children: React.ReactNode }) {
       document.getElementById('main-content')?.focus();
     }} className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:bg-card focus:p-3">Skip to content</a>
     <header className="sticky top-0 z-20 border-b border-line bg-surface/95 backdrop-blur-sm">
-      <div className="mx-auto flex min-h-20 max-w-7xl items-center justify-between gap-4 px-4 sm:px-8">
+      <div className="mx-auto flex min-h-20 max-w-7xl items-center justify-between gap-4 px-4 py-2 sm:px-8">
         <div>
           <Link to="/" className="font-heading text-headline-md text-ink">{person.name}</Link>
-          <div className="font-mono text-xs text-muted">Wrocław · CS &amp; NeuroAI</div>
+          <div className="font-mono text-xs text-muted">Cumilla · ICT &amp; Machine Learning</div>
+          <p className="mt-1 w-fit rounded-full border border-teal/40 bg-card px-2 py-0.5 text-xs font-semibold text-teal">{person.tagline}</p>
         </div>
-        <nav aria-label="Main" className="hidden gap-5 text-sm lg:flex">{links}</nav>
+        <nav aria-label="Main" className="hidden gap-5 text-sm xl:flex">{links}</nav>
         <div className="flex items-center gap-2">
           <a className="hidden p-2 sm:block" aria-label="GitHub" href={person.links.github}><Github size={20} /></a>
-          <a className="hidden p-2 sm:block" aria-label="Google Scholar" href={person.links.scholar}><GraduationCap size={20} /></a>
           <a className="hidden p-2 sm:block" aria-label="Email" href={email}><Mail size={20} /></a>
           {themeButton}
           {(youtubeTracks.length > 0 || tracks.length > 0) && <Suspense fallback={null}>
             <MusicPlayer />
           </Suspense>}
-          <button type="button" className="p-2 lg:hidden" aria-label="Open menu" onClick={() => menu.current?.showModal()}><Menu /></button>
+          <button type="button" className="p-2 xl:hidden" aria-label="Open menu" onClick={() => menu.current?.showModal()}><Menu /></button>
         </div>
       </div>
     </header>
     <dialog ref={menu} aria-label="Navigation menu" className="fixed top-0 right-0 left-auto m-0 h-dvh max-h-dvh w-72 bg-surface p-6 text-ink backdrop:bg-ink/40">
       <button type="button" autoFocus className="mb-4 p-2" aria-label="Close menu" onClick={() => menu.current?.close()}><X /></button>
       <nav aria-label="Mobile" className="flex flex-col gap-2">{links}</nav>
-      <div className="mt-4 flex flex-wrap gap-5"><a href={person.links.github}>GitHub</a><a href={person.links.scholar}>Google Scholar</a><a href={email}>Email</a></div>
+      <div className="mt-4 flex flex-wrap gap-5"><a href={person.links.github}>GitHub</a><a href={email}>Email</a></div>
     </dialog>
     {children}
     <footer className="mt-auto border-t border-line bg-limits">
@@ -83,10 +85,10 @@ export function Shell({ children }: { children: React.ReactNode }) {
         <div><p className="font-heading text-headline-md">{person.name}</p><p className="mt-2 text-sm text-muted">{person.tagline}</p></div>
         <div className="md:text-right">
           <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm md:justify-end">
-            <a href={person.links.github}>GitHub</a><a href={person.links.scholar}>Google Scholar</a>
-            <a href={person.links.linkedin}>LinkedIn</a><a href={person.links.arxiv}>arXiv</a><a href={email}>Email</a>{cv && <a href={cv}>CV PDF</a>}
+            <a href={person.links.github}>GitHub</a>
+            <a href={person.links.arxiv}>arXiv</a><a href={email}>Email</a>{cv && <a href={cv}>CV PDF</a>}
           </div>
-          <p className="mt-4 font-mono text-xs text-muted">© 2026 {person.name} · Code MIT</p>
+          <p className="mt-4 font-mono text-xs text-muted">© 2026 {person.name}</p>
         </div>
       </div>
     </footer>

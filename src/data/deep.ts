@@ -25,12 +25,12 @@ export type Block =
   | {kind: 'status'; title: string; note: string; complete: number; failed: number; caption: string}
   | {kind: 'funnel'; title: string; stages: {value: string; label: string; note?: string}[]}
   | {kind: 'scores'; title: string; items: {id: string; title: string; detail: string; status: 'Supported' | 'Not supported' | 'Descriptive'}[]}
-  | {kind: 'flow'; title: string; stages: string[]; branches?: string[]; examples?: string[]}
+  | {kind: 'flow'; title: string; stages: string[]; branches?: string[]; examples?: string[]; localData?: string}
   | {kind: 'timeline'; title: string; anchor: string; stages: Note[]}
   | {kind: 'figure'; index: number}
   | {kind: 'browser'; title: string; url?: string; pages: {label: string; href: string; image?: string; width?: number; height?: number}[]; callouts: string[]}
   | {kind: 'chat'; title: string; lanes: string[]; user: string; action: string; voice: string};
-export type DeepSection = {id: string; title: string; blocks: Block[]; base?: SectionKey[]};
+export type DeepSection = {id: string; title: string; blocks: Block[]; base?: SectionKey[]; verify?: boolean};
 export type DeepProject = {
   badges?: string[];
   metrics: Metric[];
@@ -41,88 +41,6 @@ export type DeepProject = {
 };
 
 export const deepProjects: Partial<Record<string, DeepProject>> = {};
-
-deepProjects['physics-residual-aqa'] = {
-  badges: ['ISRC 2026', 'Negative result, reported as such'],
-  metrics: [
-    {label: 'Precision needed', value: '≈3 px', caption: 'Per-coordinate noise in the synthetic experiment', chip: 'Synthetic requirement', tone: 'teal', icon: 'target'},
-    {label: 'Best model median', value: '9.48 px', caption: 'NSAQA, fine-tuned on diving', chip: '3.2× the requirement', tone: 'primary', icon: 'activity'},
-    {label: 'p90 after fine-tuning', value: '−57%', caption: 'Reduction relative to generic ViTPose', chip: '78.97 → 33.99 px', tone: 'coral', icon: 'spark'},
-    {label: 'Human self-disagreement', value: '7.8 px', caption: 'Same annotator, relabelled footage', chip: '47 paired points, 6 frames', tone: 'neutral', icon: 'layers'},
-  ],
-  artifact: {title: 'Pose precision and the verification gap', eyebrow: 'Analytical gauge', blocks: [{
-    kind: 'gauge', title: 'Synthetic requirement and observed errors', max: 20, zone: 3,
-    markers: [{label: 'ViTPose', value: 9.87, tone: 'primary'}, {label: 'RTMPose', value: 10.29, tone: 'neutral'}, {label: 'NSAQA', value: 9.48, tone: 'coral'}],
-    reference: {label: 'Human self-disagreement', value: 7.8, tone: 'neutral'}, gapTo: 9.48,
-    models: ['ViTPose', 'RTMPose', 'NSAQA'],
-    phases: [
-      {label: 'Takeoff', values: [7.86, 8.05, 7.73], n: 111}, {label: 'Early', values: [7.87, 8.71, 8.04], n: 100},
-      {label: 'Peak', values: [10.38, 10.41, 8.74], n: 79}, {label: 'Rotation 1', values: [14.14, 14.57, 11.85], n: 115},
-      {label: 'Rotation 2', values: [17.24, 22.06, 18.50], n: 35},
-    ],
-    caption: 'Error is worst exactly where the physics check is needed.',
-  }]},
-  sections: [
-    {id: 'question', title: 'The question', base: ['question'], blocks: [
-      {kind: 'equation', title: 'Invariant conservation bounds', equations: ['y(t) = y₀ + v₀t − ½gt²', 'dL/dt = 0'],
-        text: 'Exact under the stated assumptions; monocular centre-of-mass and inertia estimates are approximations, so a violation implicates the pose/camera/measurement model, not the athlete.'},
-    ]},
-    {id: 'importance', title: 'Why it matters', base: ['why'], blocks: []},
-    {id: 'approach', title: 'What I did', blocks: [{kind: 'steps', items: [
-      {title: 'Clip extraction', tools: ['ffmpeg', 'MTL-AQA annotations'], body: 'Cut dive clips from broadcast video using MTL-AQA annotations.'},
-      {title: 'Hand labelling', tools: ['Manual'], body: 'Labelled 160 frames across takeoff, early flight, peak, two rotation phases and entry; 81 had a labelled shoulder and hip.'},
-      {title: 'Synthetic requirement', tools: ['NumPy', 'Seeded'], body: '6 noise levels × 4 break sizes × 100 trials on a 100 px torso.'},
-      {title: 'Benchmark and residuals', tools: ['ViTPose', 'RTMPose', 'NSAQA'], body: 'Compared per-joint error against the hand labels phase by phase and against the synthetic threshold.'},
-    ]}]},
-    {id: 'findings', title: 'What I found', blocks: [
-      {kind: 'heatmap', title: 'Synthetic detection rates', headers: [1, 2, 3, 5, 8, 10], highlight: 3,
-        rows: [
-          {label: '5%', values: [84, 30, 15, 10, 4, 4]}, {label: '10%', values: [100, 85, 46, 17, 11, 10]},
-          {label: '20%', values: [100, 100, 98, 57, 24, 15]}, {label: '40%', values: [100, 100, 100, 100, 70, 51]},
-        ], caption: 'Known-frame detection. 100 seeded trials per cell.'},
-      {kind: 'table', title: 'Pose benchmark', headers: ['Model', 'Median (px)', 'p90 (px)', 'Gross failures (%)', 'Missed (%)'],
-        rows: [
-          {cells: ['ViTPose (generic)', '9.87', '78.97', '14.2', '7.9']},
-          {cells: ['RTMPose (generic)', '10.29', '69.91', '12.1', '7.9']},
-          {cells: ['NSAQA (diving-finetuned)', '9.48', '33.99', '8.4', '7.9'], tone: 'best'},
-          {cells: ['Human self-disagreement', '7.8', '—', '—', '—'], tone: 'reference'},
-          {cells: ['Synthetic requirement', '≈3', '—', '—', '—'], tone: 'bound'},
-        ], caption: '440 measured errors from 478 visible joint labels per model. A gross failure places a joint more than half a hand-labelled torso away. Synthetic noise is per-coordinate and model errors are Euclidean. The comparison is indicative.'},
-      {kind: 'notes', items: [
-        {title: 'Tail collapse', body: 'Fine-tuning cut p90 by 57% (78.97 → 33.99 px) and gross failures from 14.2% to 8.4%.', tone: 'teal'},
-        {title: 'Median floor', body: 'The median barely moved (9.87 → 9.48 px).'},
-        {title: 'Verification gap', body: 'The best median is about 3.2× the ≈3 px requirement.', tone: 'coral'},
-      ]},
-      {kind: 'ranges', title: 'Human consistency by joint', max: 22, rows: [
-        {label: 'Overall', low: 7.8, high: 7.8}, {label: 'Excluding probable left/right swaps', low: 6.5, high: 6.5},
-        {label: 'Hips', low: 20, high: 22, note: 'Worst agreement'},
-        {label: 'Shoulders, elbows, wrists and ankles', low: 7, high: 10},
-        {label: 'Head', low: 5, high: 5, note: 'Approximate'},
-      ], caption: 'Visibility decisions agreed 99%.'},
-      {kind: 'figure', index: 0}, {kind: 'figure', index: 1},
-    ]},
-    {id: 'limits', title: 'What this does not show', blocks: [{kind: 'limits', items: [
-      {title: 'Single frames', body: 'Temporal filtering might close part of the gap or suppress the signal. It was untested.'},
-      {title: 'Entry unmeasured', body: '0 of 20 entry frames had a labellable torso.'},
-      {title: 'Head excluded', body: 'The label sets use different head definitions.'},
-      {title: 'Monocular projection', body: 'Camera motion, segment-mass approximations and out-of-plane motion limit interpretation.'},
-      {title: 'No scoring claim', body: 'These experiments do not establish that residuals predict judges’ scores.'},
-    ]}]},
-    {id: 'reproduce', title: 'Reproduce it', blocks: [{kind: 'terminal', file: 'Terminal', code: [
-      'git clone https://github.com/donti507/physics-residual-aqa.git',
-      'cd physics-residual-aqa',
-      'python -m venv .venv',
-      '. .venv/bin/activate',
-      'python -m pip install numpy matplotlib',
-      'python src/summarize_results.py',
-      'python src/make_figures.py --results results',
-    ].join('\n')}]},
-    {id: 'next', title: 'What’s next', base: ['next'], blocks: []},
-  ],
-  provenance: 'Frames from MTL-AQA broadcast diving clips. 160 hand-labelled PNGs; 81 had a labelled shoulder and hip; 478 visible joint labels per model.',
-  dossier: {venue: 'ISRC 2026, Dhaka University Research Society (Dec 2026)', datasets: ['MTL-AQA clips'],
-    stack: ['Python', 'NumPy', 'SciPy', 'ffmpeg', 'Matplotlib', 'ViTPose', 'RTMPose', 'NSAQA']},
-};
 
 const strategies = [
   {name: 'Random Search', trials: 480, best: '93.10%', mean: 61.26, std: '0.268', cost: 0.144},
@@ -136,7 +54,7 @@ const tpeSweep = [
   {label: '40 workers', x: 40, y: 77.9, note: 'n=98'},
 ];
 
-deepProjects['budgetaware-hpo'] = {
+const budgetBenchmarks: DeepProject = {
   metrics: [
     {label: 'Trial records', value: '1,336', caption: 'Reported experiment total', chip: '15 Optuna studies', tone: 'neutral', icon: 'files'},
     {label: 'Parallel capacity', value: '40', caption: 'V100 GPUs at once', chip: 'Eagle HPC, PCSS', tone: 'primary', icon: 'cpu'},
@@ -154,7 +72,7 @@ deepProjects['budgetaware-hpo'] = {
   sections: [
     {id: 'question', title: 'The question', base: ['question'], blocks: []},
     {id: 'importance', title: 'Why it matters', base: ['why'], blocks: []},
-    {id: 'approach', title: 'What I did', blocks: [
+    {id: 'approach', title: 'Benchmark setup', blocks: [
       {kind: 'steps', items: [
         {title: 'Search space and models', tools: ['PyTorch', 'Optuna'], body: 'ResNet-18 and EfficientNet-B0 on CIFAR-10 and CIFAR-100.'},
         {title: 'Four strategies', tools: ['Optuna samplers'], body: 'Random Search, TPE, Hyperband and CMA-ES.'},
@@ -165,7 +83,7 @@ deepProjects['budgetaware-hpo'] = {
         rows: strategies.map(method => ({cells: [method.name, method.trials, method.best, method.mean.toFixed(2) + '%', method.std, method.cost.toFixed(3)], tone: method.name === 'Hyperband' ? 'best' : undefined}))},
       {kind: 'figure', index: 0},
     ]},
-    {id: 'findings', title: 'I audited my own results', blocks: [
+    {id: 'findings', title: 'Benchmark audit', blocks: [
       {kind: 'funnel', title: 'Archive reconciliation', stages: [
         {value: '2,211', label: 'JSON files'},
         {value: '1,337', label: 'Trial records in the audit', note: '874 per-worker snapshots set aside.'},
@@ -204,7 +122,7 @@ sampler = optuna.samplers.TPESampler(seed=42, constant_liar=True)`,
       code: 'sbatch --array=1-40%40 hpo_v2.slurm tpe cifar10 40\nsbatch --array=1-40%40 hpo_v2.slurm hyperband cifar10 40'}]},
   ],
   provenance: 'Strategy results are pooled and pre-audit. The TPE sweep uses the deduplicated audit data.',
-  dossier: {venue: 'Eagle HPC, PCSS Poznań · grant pl0844-01', equipment: 'Tesla V100-SXM2-32GB',
+  dossier: {venue: 'Eagle HPC, PCSS Poznań', equipment: 'Tesla V100-SXM2-32GB',
     stack: ['Python 3.10', 'PyTorch 2.6', 'Optuna 3.6.1', 'SLURM', 'conda'], datasets: ['CIFAR-10', 'CIFAR-100']},
 };
 
@@ -214,7 +132,7 @@ deepProjects['fly-connectome'] = {
     {label: 'Wiring versions', value: '9', caption: 'Biological and reconstruction variants', chip: '4 flies + 5 same-fly variants', tone: 'primary', icon: 'layers'},
     {label: 'Own-wiring error', value: '0.3–1.6°', caption: 'Heading error on the wiring used for training', tone: 'teal', icon: 'target'},
     {label: 'Weight perturbation', value: '10–28°', caption: 'Heading error after a 1% weight change', tone: 'coral', icon: 'activity'},
-    {label: 'Neurons', value: '433', caption: 'FlyWire compass circuit neurons rendered in the browser', tone: 'neutral', icon: 'spark'},
+    {label: 'Neurons', value: '433', caption: 'Neurons in the FlyWire compass circuit', tone: 'neutral', icon: 'spark'},
   ],
   artifact: {title: 'Reconstruction and individual differences', eyebrow: 'Primary evidence', split: true, blocks: [
     {kind: 'dots', title: 'Differences on one scale', unit: 'Map distance', ticks: [0, 0.05, 0.10, 0.15, 0.20, 0.22], band: [0.022, 0.068],
@@ -233,13 +151,13 @@ deepProjects['fly-connectome'] = {
   sections: [
     {id: 'question', title: 'The question', base: ['question'], blocks: []},
     {id: 'importance', title: 'Why it matters', base: ['why'], blocks: []},
-    {id: 'approach', title: 'What I did', blocks: [{kind: 'steps', items: [
-      {title: 'Nine wiring versions', tools: ['neuPrint', 'FlyWire Codex'], body: 'EPG, PEG, PEN, Delta7 and ER1–6 cell types; at least 3 synapses per neuron pair; signs by cell type.'},
-      {title: 'Neuron matching and distances', tools: ['Python', 'SciPy'], body: 'Matched neurons by wiring, checked against anatomical labels, using 4 distance measures.'},
-      {title: 'Trained ring attractors', tools: ['PyTorch', 'Free T4 GPU'], body: 'Trained recurrent networks on each wiring to hold a cued heading.'},
-      {title: 'Transplants and refits', tools: ['PyTorch'], body: 'Moved networks between wirings and refit about 30 cell-type gains.'},
+    {id: 'approach', title: 'What I did', verify: true, blocks: [{kind: 'steps', items: [
+      {title: 'Preregistered tests', body: 'I analysed the five preregistered hypotheses (H1–H5).'},
+      {title: 'Paired differences', body: 'I used paired Wilcoxon tests with Holm adjustment and Spearman correlations.'},
+      {title: 'Group comparisons', body: 'I used Kruskal–Wallis and Mann–Whitney tests.'},
+      {title: 'Drift', body: 'I estimated drift uncertainty with bootstrap intervals.'},
     ]}]},
-    {id: 'findings', title: 'What I found', base: ['findings'], blocks: [
+    {id: 'findings', title: 'What we found', base: ['findings'], blocks: [
       {kind: 'scores', title: 'Preregistered hypotheses', items: [
         {id: 'H1', title: 'Networks are fragile under transplant', detail: 'Median transplant ratio R = 87 (cell-type gains) and 162 (neuron gains); threshold R > 5.', status: 'Supported'},
         {id: 'H2', title: 'Neuron-level R exceeds cell-type R', detail: '162 vs 87; paired Wilcoxon, Holm-adjusted p = 0.0007.', status: 'Supported'},
@@ -277,240 +195,68 @@ deepProjects['fly-connectome'] = {
   ]},
 };
 
-const connectomePages = [
-  {
-    "label": "Explore",
-    "href": "https://donti507.github.io/connectometwin/index.html",
-    "image": "projects/connectometwin/pages-explore.webp",
-    "width": 1002,
-    "height": 1200
-  },
-  {
-    "label": "Guided story",
-    "href": "https://donti507.github.io/connectometwin/story.html",
-    "image": "projects/connectometwin/pages-story.webp",
-    "width": 600,
-    "height": 750
-  },
-  {
-    "label": "Wiring differences",
-    "href": "https://donti507.github.io/connectometwin/matrix.html",
-    "image": "projects/connectometwin/pages-matrix.webp",
-    "width": 600,
-    "height": 729
-  },
-  {
-    "label": "Neuron inspector",
-    "href": "https://donti507.github.io/connectometwin/neuron.html",
-    "image": "projects/connectometwin/pages-neuron.webp",
-    "width": 600,
-    "height": 848
-  },
-  {
-    "label": "Orthogonal projection",
-    "href": "https://donti507.github.io/connectometwin/projection.html",
-    "image": "projects/connectometwin/pages-projection.webp",
-    "width": 600,
-    "height": 621
-  },
-  {
-    "label": "Compass circuit wiring",
-    "href": "https://donti507.github.io/connectometwin/circuit.html",
-    "image": "projects/connectometwin/pages-circuit.webp",
-    "width": 600,
-    "height": 600
-  }
+
+const pendingDeepProjects: { slug: string; content: DeepProject; verify?: boolean }[] = [
+  {slug: 'budgetaware-hpo', content: budgetBenchmarks, verify: true},
 ];
-deepProjects['connectometwin'] = {
+for (const project of pendingDeepProjects) {
+  if (!project.verify) deepProjects[project.slug] = project.content;
+}
+
+deepProjects['federated-ids'] = {
   metrics: [
-    {label: 'Neurons rendered', value: '433', caption: 'FlyWire compass-circuit anatomy', tone: 'primary', icon: 'layers'},
-    {label: 'Reference cases', value: '46', caption: 'Model behaviour checked against the paper', tone: 'neutral', icon: 'shield'},
-    {label: 'Headless rendering', value: '58 fps', caption: 'At 4× CPU throttling', tone: 'coral', icon: 'activity'},
-    {label: 'Build dependencies', value: '0', caption: 'Browser app with no build step', tone: 'teal', icon: 'cpu'},
+    {label: 'Federated clients', value: '5', caption: 'Clients in the recorded run', chip: 'LAN, multi-PC', tone: 'primary', icon: 'layers'},
+    {label: 'Local training records', value: '28.1 M', caption: '28,107,422 samples per round', chip: 'Sum over 5 clients', tone: 'neutral', icon: 'files'},
+    {label: 'Traffic classes', value: '14 → 18', caption: 'Four classes discovered during training', tone: 'teal', icon: 'target'},
+    {label: 'Federated rounds', value: '3', caption: 'Rounds in the saved server log', tone: 'primary', icon: 'activity'},
   ],
-  artifact: {title: 'Explore the compass circuit', eyebrow: 'Live application', blocks: [{
-    kind: 'browser', title: 'ConnectomeTwin', url: 'https://donti507.github.io/connectometwin/', pages: connectomePages,
-    callouts: ['Swap reconstruction', 'Refit cell-type gains', 'Heading error 8° → 85°'],
-  }]},
-  sections: [
-    {id: 'question', title: 'The question', base: ['question', 'why'], blocks: []},
-    {id: 'approach', title: 'How it’s built', blocks: [{kind: 'features', items: [
-      {title: 'Rendering', body: 'Three.js with full branches on hardware GPUs, a labelled Canvas projection when WebGL cannot start, and a 2D ring view. The overview is 2.6 MB; optional full detail is 10.2 MB.'},
-      {title: 'Correctness', body: '46 model reference cases (self-check.html), unit tests, Playwright browser tests and a GitHub Actions workflow that validates and deploys.', tone: 'teal'},
-      {title: 'Accessibility', body: 'System theme with an override; keyboard controls (Space, R, arrows, Home, [ / ]); starts paused with reduced motion; and shows error values as text alongside plots.'},
-      {title: 'Efficiency', body: 'Loads 2 wirings at startup instead of 7. A Web Worker runs 16-heading benchmarks. Shows the strongest 1,200 edges by default.'},
-    ]}]},
-    {id: 'performance', title: 'Performance', blocks: [{kind: 'table', title: 'Largest wiring · 33,783 edges · 2D ring view',
-      headers: ['Edges shown', 'fps', 'p95 frame gap'], rows: [
-        {cells: ['Default (strongest 1,200)', '58.3', '25.2 ms']}, {cells: ['All', '60.4', '21.5 ms']},
-      ], caption: 'Headless Chromium at 1366 px with 4× CPU throttling. A slower-CPU proxy rather than a physical-laptop benchmark.'}]},
-    {id: 'try', title: 'Try it', blocks: [{kind: 'terminal', file: 'Terminal', code: 'cd connectometwin/web && python -m http.server 8000'}]},
-  ],
-  dossier: {datasets: ['FlyWire compass circuit']},
-};
-
-deepProjects['zen-os'] = {
-  metrics: [
-    {label: 'Workspace views', value: '6', caption: 'Tasks, Kanban, Calendar, Meetings, Analytics and Link vault', tone: 'primary', icon: 'layers'},
-    {label: 'Voice languages', value: '7', caption: 'Voice input includes Polish', tone: 'teal', icon: 'activity'},
-    {label: 'Automated tests', value: '583', caption: 'Test cases in the project', tone: 'neutral', icon: 'shield'},
-    {label: 'Default rate limit', value: '20/min', caption: 'Per user on the Dante API', tone: 'coral', icon: 'clock'},
-  ],
-  artifact: {title: 'ZEN_OS workspace and Dante', eyebrow: 'Product walkthrough', blocks: [{
-    kind: 'chat', title: 'Illustrative mock-up', lanes: ['Kanban board', 'Calendar and meetings', 'Tasks', 'Link vault'],
-    user: 'Move my thesis meeting to tomorrow at 4', action: 'Updated: Thesis meeting → Wed 16:00 · reason shown', voice: 'Conversation mode',
-  }]},
-  sections: [
-    {id: 'question', title: 'The premise', base: ['question', 'why'], blocks: []},
-    {id: 'features', title: 'Workspace features', blocks: [{kind: 'features', items: [
-      {title: 'Tasks', body: 'Create, update, complete and reopen tasks.'}, {title: 'Kanban board', body: 'View tasks on a board.'},
-      {title: 'Calendar', body: 'Sync with Google Calendar.'}, {title: 'Meetings', body: 'Use a stopwatch and write notes.'},
-      {title: 'Analytics', body: 'View workspace activity and streaks.'}, {title: 'Link vault', body: 'Keep links in the workspace.'},
-    ]}]},
-    {id: 'dante', title: 'What Dante can do', blocks: [{kind: 'list', items: [
-      'Stream answers and stop with Stop or Esc.',
-      'Use tasks, meetings, events, vault, streak, the current date and timezone as context.',
-      'Create, complete, reopen and update tasks.',
-      'Schedule meetings, switch views and filter categories.',
-      'Take voice input in 7 languages, including Polish.',
-      'Read answers aloud with sentence highlighting.',
-      'Run a hands-free conversation mode.',
-      'Remember short preferences that you can inspect and forget.',
-      'Hide <think> reasoning from open models.',
-    ]}]},
-    {id: 'safety', title: 'How Dante stays safe', blocks: [{kind: 'notes', items: [
-      {title: 'Authenticated API', body: '/api/dante needs a valid Supabase login. The default rate limit is 20/min per user.', tone: 'teal'},
-      {title: 'Server-side key', body: 'The LLM key never reaches the browser.'},
-      {title: 'Row-level security', body: 'Every table uses row-level security, with WITH CHECK on inserts.'},
-      {title: 'Visible actions', body: 'Dante displays each change with ✓ or ✗ and the reason.', tone: 'teal'},
-    ]}]},
-    {id: 'architecture', title: 'Architecture', blocks: [
-      {kind: 'flow', title: 'Application data flow', stages: ['React 19 + Vite + Tailwind v4', 'Express API · /api/dante', 'Supabase · auth + Postgres with RLS'],
-        branches: ['Express can also call an OpenAI-compatible LLM (PSNC, vLLM, Ollama, OpenRouter) or Gemini.']},
-      {kind: 'text', text: 'Browser-only local mode works without Supabase. Supabase Realtime syncs across devices, and the Docker image supports runtime-injected configuration.'},
-    ]},
-    {id: 'limits', title: 'Limits', blocks: [{kind: 'limits', items: [
-      {title: 'Voice input', body: 'Requires HTTPS and the browser Web Speech API (Chrome, Edge, Safari). Audio is sent to the browser’s speech service.'},
-    ]}]},
-    {id: 'reproduce', title: 'Run it', blocks: [
-      {kind: 'terminal', file: 'Local development', code: 'npm install\ncp .env.example .env\nnpm run dev'},
-      {kind: 'terminal', file: 'Docker', code: 'docker build -t zen-os .\ndocker run -p 3000:3000 --env-file .env zen-os'},
-    ]},
-  ],
-};
-
-const verifierRules: Row[] = [
-  {cells: ['V1 · Schema', 'Required fields present; codes valid in FpML enumerations', '—', 'HARD on missing or invalid']},
-  {cells: ['V2 · Grounding', 'Value appears in or normalises from its cited span', 'Edit distance / relative difference', 'HARD above threshold; SOFT near']},
-  {cells: ['V3 · Temporal', 'Trade ≤ effective < termination; tenor matches dates', 'Days', 'HARD']},
-  {cells: ['V4 · Calendar', 'Regenerate the schedule with QuantLib and compare', 'Days off', 'HARD when dates differ']},
-  {cells: ['V5 · Accrual', 'Recompute stated amounts', 'Currency units', 'HARD beyond rounding']},
-  {cells: ['V6 · Cross-field', 'Index/currency, tenor and leg notionals consistent', 'Categorical', 'HARD or SOFT']},
-  {cells: ['V7 · Convention prior', 'Day count/calendar vs market standard', 'Categorical', 'SOFT only']},
-];
-const defects: [string, number[]][] = [
-  ['Contradiction', [2,6]], ['Amendment', []], ['Non-standard calendar', [4]], ['Swapped legs', []],
-  ['Scale error', [2,5]], ['Unusual day count', [7]], ['Stub ambiguity', [4]], ['Multiple notionals', []],
-  ['Legacy index fallback', [6]], ['OCR digit corruption', [2]], ['Missing information', [1]], ['Prompt injection (security test)', []],
-];
-const rules = verifierRules.map((_, index) => index + 1);
-
-deepProjects['trust-but-verify'] = {
-  metrics: [
-    {label: 'Verifier rule families', value: '7', caption: 'Schema through convention checks', tone: 'primary', icon: 'shield'},
-    {label: 'Defect types', value: '12', caption: 'Synthetic examples with expected rule triggers', tone: 'coral', icon: 'target'},
-    {label: 'Filings screened', value: '300', caption: 'Seeded sample across four eras', tone: 'neutral', icon: 'files'},
-    {label: 'Automated tests', value: '178', caption: 'Tests for the tooling', tone: 'teal', icon: 'activity'},
-  ],
-  artifact: {title: 'From contract to a review decision', eyebrow: 'Verification pipeline', blocks: [{
-    kind: 'flow', title: 'Field-level workflow', stages: ['Contract (PDF/HTML)', 'LLM proposes field and evidence span', 'QuantLib/CDM verifier · never edits values', 'Cost-aware selector · conformal risk control'],
-    branches: ['Auto-accept', 'Human review'],
-    examples: ['Required field missing → V1 Schema: HARD', 'Calendar differs from regenerated schedule → V4 Calendar: HARD'],
-  }]},
-  sections: [
-    {id: 'question', title: 'The question', base: ['question', 'why'], blocks: []},
-    {id: 'rules', title: 'The verifier rules', blocks: [{kind: 'table', title: 'Rule families', headers: ['Rule', 'Checks', 'Residual', 'Verdict'], rows: verifierRules}]},
-    {id: 'defects', title: 'The defect test bench', blocks: [{kind: 'table', title: 'Defects and expected triggers',
-      headers: ['Defect', ...rules.map(rule => 'V' + rule), 'Expected result'],
-      rows: defects.map(([name, triggers]) => ({cells: [name, ...rules.map(rule => triggers.includes(rule) ? '✓' : '—'), triggers.length ? 'Rule trigger' : 'Silent']})),
-      caption: 'Predictions to test, not observed results.'}]},
-    {id: 'annotation', title: 'How labels are made', blocks: [{kind: 'notes', items: [
-      {title: 'Explicit', body: 'Value and exact span in the document.'}, {title: 'By reference', body: 'Supplied by an incorporated definition.'},
-      {title: 'Ambiguous', body: 'Competing statements, escalate.', tone: 'coral'},
-      {title: 'Absent', body: 'No applicable statement. A positive human decision.', tone: 'teal'},
-    ]}]},
-    {id: 'pipeline', title: 'Data pipeline', blocks: [{kind: 'steps', items: [
-      {title: 'EDGAR scope', tools: ['EDGAR'], body: '4 quoted swap phrases from 2001 onward across 8-K, 10-Q, 10-K and exhibits. 4 requests/s with backoff.'},
-      {title: 'Hash-verified storage', tools: ['SHA-256'], body: 'The manifest records file hashes. Altered files are never replaced.'},
-      {title: 'Seeded screen', body: '75 filings per era (2001–05, 2006–08, 2009–21, 2022–now), for 300 total.'},
-      {title: 'Synthetic generator', body: '6 layouts with labelled defects: term sheet, letter, two-column, label–value, legal preamble and dealer caps.'},
-    ]}]},
-    {id: 'protocol', title: 'Five rules that never bend', blocks: [{kind: 'list', items: [
-      'Never touch the real test split before preregistration.', 'The verifier never edits a value.', 'An LLM never writes a gold label.',
-      'Never mix collections.', 'Cache every model output by input hash.',
-    ]}]},
-    {id: 'progress', title: 'Progress', blocks: [{kind: 'timeline', title: 'Study milestones', anchor: 'Annotation in progress', stages: [
-      {title: 'EDGAR corpus', body: 'Complete'}, {title: 'Synthetic generator', body: 'Complete'}, {title: 'Annotation tools', body: 'Complete'},
-      {title: 'Annotation', body: 'In progress'}, {title: 'Preregistration', body: 'Upcoming'}, {title: 'First models', body: 'Upcoming'},
-    ]}]},
-    {id: 'limits', title: 'Limits', blocks: [{kind: 'limits', items: [
-      {title: 'Test split locked', body: 'No model results yet; the real test split stays locked until preregistration.'},
-    ]}]},
-  ],
-  dossier: {datasets: ['SEC EDGAR filings', 'Synthetic documents']},
-};
-
-const adniWindows: Row[] = [
-  {cells: ['MRI', '≤180 days from index']},
-  {cells: ['Amyloid PET', '≤180 days from index']},
-  {cells: ['MRI to amyloid PET', '≤180 days apart']},
-  {cells: ['Cognition baseline', '≤180 days from index']},
-  {cells: ['Diagnosis baseline', '≤180 days from index']},
-  {cells: ['Plasma p-tau217', '≤365 days from index']},
-  {cells: ['Follow-up', 'Censored at 1,826 days (5 years)']},
-  {cells: ['12 months', '365 days']},
-  {cells: ['Record selection', 'Nearest qualifying record by absolute days']},
-];
-
-deepProjects['adni-brain-age'] = {
-  metrics: [
-    {label: 'Data sources', value: '11', caption: 'ADNI tables specified in the plan', tone: 'neutral', icon: 'files'},
-    {label: 'Follow-up', value: '5 years', caption: 'Censored at 1,826 days', tone: 'teal', icon: 'clock'},
-    {label: 'Imaging window', value: '±180 days', caption: 'MRI and amyloid PET relative to index', tone: 'primary', icon: 'target'},
-    {label: 'Multiple testing', value: 'FDR', caption: 'Multiple-testing control', tone: 'coral', icon: 'shield'},
-  ],
-  artifact: {title: 'Imaging, index and follow-up', eyebrow: 'Preregistered design', blocks: [{
-    kind: 'timeline', title: 'Record selection windows', anchor: 'Index: earliest qualifying tau PET',
-    stages: [
-      {title: 'MRI and amyloid PET', body: 'Each within ±180 days of the index and within 180 days of each other.'},
-      {title: 'Baseline outcome records', body: 'Cognition and diagnosis within 180 days of the index.'},
-      {title: 'Plasma p-tau217', body: 'Within 365 days of the index.'},
-      {title: 'Follow-up for cognitive decline', body: 'From index to index + 1,826 days.'},
-    ],
-  }]},
+  artifact: {title: 'Federated training and model measurements', eyebrow: 'Primary evidence', split: true, blocks: [
+    {kind: 'flow', title: 'Training loop', stages: [
+      'Clients train on local CSVs with partial_fit()',
+      'Clients send weights and sample counts',
+      'Flower and Flask server collects updates',
+      'Server weights updates by sample count',
+      'New global model goes back to clients',
+    ], localData: 'Raw data stays local'},
+    {kind: 'line', title: 'Global model coefficient norm by round', xLabel: 'Federated round', yLabel: 'Coefficient L2 norm',
+      xTicks: [0, 1, 2, 3], yTicks: [0, 20, 40, 60, 80, 100], points: [
+        {label: 'Main', x: 0, y: 0},
+        {label: 'Round 1', x: 1, y: 80.30, note: '+80.30'},
+        {label: 'Round 2', x: 2, y: 40.43, note: '−39.87 (−49.7%)'},
+        {label: 'Round 3', x: 3, y: 27.01, note: '−13.41 (−33.2%)'},
+      ],
+      caption: 'The coefficient norm fell after round one. A smaller norm does not establish convergence or tell us how accurately the model detects attacks.',
+    },
+  ]},
   sections: [
     {id: 'question', title: 'The question', base: ['question'], blocks: []},
     {id: 'importance', title: 'Why it matters', base: ['why'], blocks: []},
-    {id: 'design', title: 'Decided before seeing data', blocks: [{kind: 'table', title: 'Eligibility windows', headers: ['Record or rule', 'Window'], rows: adniWindows}]},
-    {id: 'data', title: 'Data', blocks: [{kind: 'tags', items: [
-      'UCSFFSX7 · FreeSurfer MRI', 'UCBERKELEY_AMY_6MM · amyloid PET', 'UCBERKELEY_TAU_6MM · tau PET',
-      'UPENN_PLASMA_FUJIREBIO_QUANTERIX · plasma', 'UWNPSYCHSUM · cognition', 'ADSP_PHC_COGN · cognition',
-      'CDR', 'DXSUM · diagnosis', 'PTDEMOG · demographics', 'AMYQC · QC', 'APOERES · APOE',
+    {id: 'approach', title: 'What I did', blocks: [
+      {kind: 'steps', items: [
+        {title: 'Architecture', tools: ['Flower', 'Flask'], body: 'I used Flower to coordinate rounds over gRPC on port 8080. Clients also uploaded model updates through a Flask HTTP API on port 5000 for scheduled aggregation. The training CSVs stayed on the clients.'},
+        {title: 'Incremental local training', tools: ['scikit-learn'], body: 'I trained an SGDClassifier on each client with partial_fit(), which supports incremental updates. The logged client implementation loads its local training split into memory.'},
+        {title: 'Weighted averaging', tools: ['FedAvg'], body: 'I combined client coefficients and intercepts in proportion to the number of samples each client trained on. The scheduled aggregation script saves a timestamped global model.'},
+        {title: 'Dynamic class discovery', body: 'The server found 14 traffic classes in 37 CSVs. Clients then reported CoAP Amplification, Merlin C&C Communication, Mirai C&C Communication and UDP Scan. The server expanded its label encoder to 18 classes.'},
+      ]},
+      {kind: 'figure', index: 0},
+    ]},
+    {id: 'findings', title: 'What I found', base: ['findings'], blocks: [
+      {kind: 'limits', items: [{
+        title: 'Why I don’t report accuracy yet',
+        body: 'My test set had 17,979 held-out rows from four cooler motor files. Every row was benign, so the perfect score tells me nothing about detecting attacks. The client logs also show a 14-versus-18-column probability mismatch and a log-loss failure caused by an unsupported eps argument.',
+        tone: 'coral',
+      }]},
+    ]},
+    {id: 'limits', title: 'Limits', blocks: [{kind: 'limits', items: [
+      {title: 'Single-class test set', body: 'The held-out data cannot measure per-class attack detection.'},
+      {title: 'Linear model', body: 'The prototype uses SGDClassifier. I have yet to benchmark deep models.'},
+      {title: 'Privacy guarantee', body: 'Client updates can leak information. I have yet to implement differential privacy or secure aggregation.'},
+      {title: 'Poisoning', body: 'A malicious client could send harmful updates. Robust aggregation, such as Krum, is future work.'},
     ]}]},
-    {id: 'log', title: 'Decision log', blocks: [{kind: 'timeline', title: 'Pre-analysis decisions', anchor: 'Before any count', stages: [
-      {title: 'D-000', body: 'Data provenance and attestation that no raw CSV was opened.'},
-      {title: 'D-001', body: 'Aligned with the proposal: amyloid window 180 days and FDR instead of Holm.'},
-      {title: 'D-002', body: 'Addressed a blocked review: confidence interval excludes null, no fallback, and named approvers.'},
-      {title: 'D-003', body: 'Listed open decisions.'},
-      {title: 'D-004', body: 'Recorded untestable assumptions.'},
-      {title: 'D-005', body: 'Fixed engineer clarifications before any count.'},
-    ]}]},
-    {id: 'open', title: 'Open decisions', blocks: [{kind: 'list', items: [
-      'Cognition source: UW, PHC, or UW primary with PHC sensitivity analysis.',
-      'APOE4 in or out of the primary model.', 'Centiloid cutoff.', 'Brain-age feature list.', 'Timeline.',
-    ]}]},
-    {id: 'findings', title: 'Findings', base: ['findings'], blocks: []},
+    {id: 'next', title: 'What’s next', base: ['next'], blocks: []},
+    {id: 'reproduce', title: 'Reproduce it', base: ['reproduce'], blocks: [{kind: 'text',
+      text: 'Use the project’s local CSV data layout and configure the Flask and Flower addresses for each client. The current server defaults to one Flower round per startup. Set its round count to three to match the logged run. The server starts retrain.py itself after Flower finishes, so start it manually only when aggregating a separate set of saved uploads.',
+    }]},
   ],
-  provenance: 'The decision log fixes the analysis rules before any count. No raw CSV was opened for the provenance attestation.',
-  dossier: {datasets: ['ADNI']},
+  provenance: 'The server, client and evaluation logs document the recorded run. The samples counted once per client are 11,058,863; 4,779,909; 4,440,789; 3,452,392; and 4,375,469.',
 };

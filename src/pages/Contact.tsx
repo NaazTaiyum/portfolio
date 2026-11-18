@@ -48,18 +48,17 @@ export default function Contact() {
   return <div className="mx-auto grid max-w-[1120px] gap-7 md:grid-cols-2">
     <section className="space-y-4">
       <h1>Get in touch</h1>
-      <p className="text-muted">I'm always happy to talk about research in NeuroAI, connectomics and reliable ML. Email is the fastest way to reach me.</p>
+      <p className="text-muted">I'm applying to research master's programmes and happy to talk about research in medical image analysis, neuroimaging and privacy-preserving ML.</p>
       <div className={panel + ' space-y-3 p-5'}>
         <a className="flex flex-wrap items-center gap-2 break-all" href={email}><Mail size={19} aria-hidden="true" />{person.email}</a>
         <CopyButton value={person.email} text="Copy email" />
       </div>
       <ul className={panel + ' divide-y divide-line px-4'}>
-        {([['GitHub', person.links.github], ['Google Scholar', person.links.scholar], ['LinkedIn', person.links.linkedin], ['arXiv', person.links.arxiv]] as const).map(([name, href]) =>
-          <li key={name}><a className="flex items-center gap-2 py-3" href={href}>
-            {name === 'GitHub' && <Github size={17} aria-hidden="true" />}{name}<ArrowUpRight className="ml-auto" size={17} aria-hidden="true" />
-          </a></li>)}
+        <li><a className="flex items-center gap-2 py-3" href={person.links.github}>
+          <Github size={17} aria-hidden="true" />GitHub<ArrowUpRight className="ml-auto" size={17} aria-hidden="true" />
+        </a></li>
       </ul>
-      <p className="flex items-center gap-2 text-muted"><MapPin size={18} aria-hidden="true" />{person.location} (CET)</p>
+      <p className="flex items-center gap-2 text-muted"><MapPin size={18} aria-hidden="true" />{person.location} (UTC+6)</p>
     </section>
     <section aria-label="Contact form" className={panel + ' self-start p-5'}><ContactForm /></section>
   </div>;

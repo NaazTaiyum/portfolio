@@ -1,47 +1,33 @@
-// src/data/site.ts
-// Real content for every non-project page. Source: CV (Nov 2026) and the existing portfolio_web site.
-// Items with `verify: true` are on the old site but NOT on the CV. Confirm them before publishing.
-
 export const person = {
-  name: 'Md Ali Ashraf Yad',
-  tagline: 'CS undergraduate in Wrocław working on NeuroAI, connectomics, HPC and reliable LLMs.',
-  location: 'Wrocław, Poland',
-  email: 'ali.ashraf.yad01@gmail.com',
+  name: 'Nazifa Tabassum Nabila',
+  tagline: 'Applying to research master’s programmes',
+  location: 'Cumilla, Bangladesh',
+  email: 'nabilanazifa70376@gmail.com',
   links: {
-    github: 'https://github.com/donti507',
-    linkedin: 'https://linkedin.com/in/md-ali-ashraf-y-28867524b',
+    github: 'https://github.com/NaazTaiyum',
     arxiv: 'https://arxiv.org/abs/2610.29205',
-    scholar: 'https://scholar.google.com/citations?user=qoNVckcAAAAJ&hl=en',
-    cv: 'Yad_CV_Research.pdf', // put the PDF in /public
+    cv: 'Nazifa_Nabila_CV.pdf',
   },
 };
 
 export const home = {
-  heroTitle: 'I study how much our models of the brain depend on the data we build them from.',
-  heroBody:
-    'I am a third-year Applied Computer Science student at Wrocław University of Science and Technology. ' +
-    'My work asks when connectome-based models can be trusted, how to run large ML experiments honestly on HPC clusters, ' +
-    'and how to check LLM outputs before people rely on them. I preregister what I can and report the results that fail.',
+  heroTitle: 'I want to build machine learning that can be trusted with sensitive data: medical images, brain scans and private networks.',
+  heroBody: 'I am an ICT graduate from Comilla University (CGPA 3.53/4.00). My project work covers federated learning, network intrusion detection and machine-learning experiments. I am applying to research-oriented master’s programmes to strengthen my mathematical foundations, software development and reproducible experimental methods, and to move towards medical image analysis and neuroimaging.',
   stats: [
-    { value: '9', label: 'connectome versions compared' },
-    { value: '1,336', label: 'trials on 40 V100 GPUs' },
+    { value: '3.53/4.00', label: 'CGPA' },
     { value: '1', label: 'arXiv preprint' },
-    { value: '433', label: 'neurons rendered in the browser' },
+    { value: '28.1 M', label: 'records in a federated training run' },
   ],
-  featuredProjectSlugs: ['fly-connectome', 'physics-residual-aqa', 'budgetaware-hpo'],
-  // "Now" strip: what I'm doing this term
   now: [
-    'Presenting the diving physics-residual result at ISRC 2026 (Dec 2026).',
-    'Annotating SEC filings for Trust but Verify.',
-    'Finalising the ADNI residual brain-age preregistration.',
+    'Preparing research master’s applications.',
+    'Extending my federated IDS with a proper multi-class evaluation and privacy protections.',
   ],
 };
 
 export const researchInterests = [
-  { title: 'Data dependence of connectome models', body: 'How much do connectome-constrained models change with the reconstruction they are built from?' },
-  { title: 'Reproducible, preregistered ML', body: 'Fixing hypotheses and analyses before looking, and reporting the predictions that fail.' },
-  { title: 'Large experiments on HPC', body: 'Running and auditing many-GPU experiments where cost and parallelism change the answer.' },
-  { title: 'Verifying LLM outputs', body: 'Deciding which model outputs a human must check, with guarantees on the error rate.' },
+  { title: 'Medical image analysis', body: 'Models that stay reliable when image quality, scanners or patient groups change.' },
+  { title: 'Neuroimaging', body: 'How analysis choices shape what we conclude about the brain; my preprint looks at this in fly connectomes.' },
+  { title: 'Resource-efficient and privacy-preserving ML', body: 'Training useful models when data must stay local or compute is limited.' },
 ];
 
 export const publications = [
@@ -52,83 +38,82 @@ export const publications = [
     venue: 'arXiv:2610.29205 [cs.NE], Oct 2026',
     note: 'Not yet peer-reviewed. Preregistered.',
     links: {
-      paper: 'https://arxiv.org/abs/2610.29205',
+      paper: person.links.arxiv,
       prereg: 'https://doi.org/10.5281/zenodo.23382486',
       code: 'https://github.com/donti507/chessfly',
-      demo: 'https://donti507.github.io/connectometwin/',
     },
     bibtex:
       '@article{yad2026reconstruction,\n  title={Reconstruction differences rival individual differences in the fly compass connectome and break trained circuit models},\n  author={Yad, Md Ali Ashraf and Nabila, Nazifa Tabassum},\n  journal={arXiv preprint arXiv:2610.29205},\n  year={2026}\n}',
-  },
-  {
-    kind: 'Accepted talk',
-    title: 'Physics-residual learning for interpretable and label-efficient diving action quality assessment',
-    authors: 'M. A. A. Yad',
-    venue: '2nd International Student Research Conference (ISRC 2026), Dhaka University Research Society, Dec 2026',
-    note: 'Abstract accepted for oral presentation.',
-    links: { code: 'https://github.com/donti507/physics-residual-aqa' },
   },
 ];
 
 export const education = [
   {
-    school: 'Wrocław University of Science and Technology',
-    degree: 'B.Sc. in Applied Computer Science',
-    dates: 'Oct 2024 – Feb 2028 (expected)',
-    location: 'Wrocław, Poland',
+    school: 'Comilla University',
+    degree: 'B.Sc. in Information and Communication Technology',
+    dates: 'Feb 2022 – Aug 2026',
+    location: 'Cumilla, Bangladesh',
+    result: 'CGPA 3.53/4.00 · 160 credits · EQF level 6',
+    coursework: ['Calculus', 'Matrix algebra and eigenvalues', 'Complex analysis', 'Fourier and Laplace methods', 'Discrete mathematics', 'Probability and statistics', 'Numerical analysis (MATLAB)', 'Data structures and algorithms', 'Databases', 'Operating systems', 'Software engineering', 'Computer networks', 'Network security and cyber law', 'Artificial intelligence', 'Signal and image processing', 'Wireless and optical communication', 'Microwave engineering'],
+  },
+  { school: 'Comilla Victoria Government College', degree: 'HSC', dates: '2018–2020', result: 'GPA 5.00/5.00' },
+  { school: 'Government Laboratory High School', degree: 'SSC', dates: '2016–2018', location: 'Cumilla', result: 'GPA 5.00/5.00' },
+];
+
+// Authors: [to confirm]
+export const conferences: { title: string; venue: string; dates: string; status: 'Accepted' | 'Presented'; role?: string; now?: string; verify?: boolean }[] = [
+  {
+    title: 'Integrating Bloom’s Taxonomy into Computer Networking Education to Promote Sustainable Development Awareness',
+    venue: '8th International Conference on Sustainable Development (ICSD 2026), United International University (UIU), Dhaka',
+    dates: '11–12 Apr 2026',
+    status: 'Accepted',
+  },
+  {
+    title: 'From E-Rickshaws to Electric Cars: Navigating Electric Vehicle Integration for Sustainable Development and Smart City Transformation in Bangladesh',
+    venue: '8th International Conference on Sustainable Development (ICSD 2026), United International University (UIU), Dhaka',
+    dates: '11–12 Apr 2026',
+    status: 'Accepted',
+  },
+  {
+    title: 'Comparative Analysis of the Impact of Physics Education on Engineering Students’ Academic Performance',
+    venue: 'International Conference on Physics 2026, Bangladesh Physics Society, Dhaka University',
+    dates: '9–11 Apr 2026',
+    status: 'Presented',
+  },
+  {
+    title: 'Physics-Residual Learning for Interpretable and Label-Efficient Diving Action Quality Assessment',
+    venue: '2nd International Student Research Conference (ISRC 2026), Dhaka University',
+    dates: '28 Dec 2026',
+    status: 'Accepted',
+    now: 'Preparing for ISRC 2026 at Dhaka University.',
+    verify: true,
   },
 ];
 
-export const honors = [
-  { title: 'Top 50, European University Challenge (Google Cloud)', date: 'Jul 2026' },
-  { title: 'Undergraduate Student Member, American Physical Society', date: 'Oct 2026 – present' },
-  { title: 'First student from Poland selected as IBM Z Campus Ambassador', date: 'May 2025' },
-];
-
-export const experience = [
-  {
-    role: 'Science News Editor and Broadcast Presenter', org: 'Akademickie Radio LUZ, Wrocław', dates: 'Oct 2024 – present', type: 'Science communication',
-    points: [
-      'Write and present weekly science news on AI, quantum computing, space and health for 10,000+ listeners, checking the sources behind every story.',
-      'Interviewed a Los Alamos scientist about what Odra 5, Poland’s first quantum computer, can really do; produced a year-in-review show in three days.',
-    ],
-  },
-  {
-    role: 'Founder and Club Lead', org: 'IBM Z Mainframe and Cloud Computing Club, PWr', dates: 'Nov 2025 – present', type: 'Leadership',
-    points: ['Started the club, got 20+ members access to IBM Z and cloud systems, and wrote the guides three project teams work from.'],
-  },
-  {
-    role: 'IBM Z Campus Ambassador', org: 'IBM Z Global Ambassador Program', dates: 'May 2025 – present', type: 'Leadership',
-    points: ['First student from Poland selected; help other students set up and troubleshoot IBM Z.'],
-  },
-  {
-    role: 'Technical Writer and Ground Support', org: 'PWr in Space, student rocketry team', dates: 'Apr 2026 – present', type: 'Engineering',
-    points: ['Write reports for competitions and sponsors, and help on the ground during tests and launches.'],
-  },
-  // On the old site but not on the CV:
-  { role: 'Co-Author & Research Assistant', org: '(fill in)', dates: '2026 – present', type: 'Research', points: [], verify: true },
-  { role: 'ULisses Fellow', org: '(fill in)', dates: 'Jan 2026 – present', type: 'Fellowship', points: [], verify: true },
+export const experience: { role: string; org: string; dates?: string; points: string[]; verify?: boolean }[] = [
+  { role: 'Volunteer', org: 'International Conference on Multidisciplinary Research in Science, Comilla University', dates: '9–10 Jan 2026', points: ['I supported registration, coordination and logistics on both days.'] },
+  { role: 'Deputy Team Lead, Documentation', org: 'TEDxComillaUniversity', points: ['I prepared official event documentation using TEDx branding guidelines and edited the materials for accuracy before publication.'] },
+  { role: 'Deputy Team Lead, Documentation', org: 'Hult Prize at Comilla University', dates: '2025–2026', points: ['I oversaw record-keeping and version control, coordinated across departments and helped deliver written materials on time for the campus round.'] },
+  { role: 'Coordinator, PR and Communication', org: 'Comilla University Career Summit', points: ['I managed PR materials and kept messaging consistent across channels.'] },
+  { role: 'Team Head, IT Debate segment', org: 'IT Fest, Comilla University', points: ['I led planning, logistics, promotion and delivery on the day of the event.'] },
 ];
 
 export const certifications = [
-  { title: 'Get Started with Pub/Sub Skill Badge', issuer: 'Google Cloud', date: 'May 2026', group: 'Cloud & systems' },
-  { title: 'Financial Markets', issuer: 'Yale University (Coursera)', date: 'May 2026', group: 'Other' },
-  { title: 'CS50x Puzzle Day 2026', issuer: 'Harvard University', date: 'Apr 2026', group: 'Competitions' },
-  { title: 'CCNA: Switching, Routing & Wireless Essentials', issuer: 'Cisco Networking Academy', date: 'Feb 2026', group: 'Cloud & systems' },
-  { title: 'CCNA: Introduction to Networks', issuer: 'Cisco Networking Academy', date: 'Feb 2026', group: 'Cloud & systems' },
-  { title: 'AI & Data Specialization', issuer: 'IBM', date: 'Dec 2025', group: 'AI & data' },
-  { title: 'IBM Z Xplore Advanced', issuer: 'IBM', date: 'Nov 2025', group: 'Cloud & systems' },
-  { title: 'Introduction to Generative AI', issuer: 'Santander Open Academy', date: 'Sep 2025', group: 'AI & data' },
-  { title: 'IBM Z Xplore Concepts', issuer: 'IBM', date: 'May 2025', group: 'Cloud & systems' },
-  { title: 'Supervised Machine Learning: Regression & Classification', issuer: 'Stanford / DeepLearning.AI', date: 'Apr 2023', group: 'AI & data' },
-  { title: 'Data Science Math Skills', issuer: 'Duke University', date: 'Apr 2023', group: 'AI & data' },
-  { title: 'Exercising Leadership: Foundational Principles', issuer: 'Harvard Aspire Institute', date: 'May 2023', group: 'Other' },
+  { title: 'Certificate of Participation', issuer: 'UNESCO Youth Hackathon 2026', date: '24 Oct 2026', note: 'Team project on “Play Your Part: Youth Designing the Future of Media and Information Literacy.”' },
 ];
 
 export const skills = {
-  Programming: ['Python', 'JavaScript', 'TypeScript', 'SQL', 'Bash', 'Java'],
-  'ML and scientific computing': ['PyTorch', 'Optuna', 'NumPy', 'pandas', 'scikit-learn', 'Matplotlib', 'Recurrent and ring-attractor models'],
-  'HPC and engineering': ['SLURM', 'Linux', 'conda', 'Git', 'GitHub Actions', 'Docker', 'pytest', 'Playwright'],
-  Data: ['FlyWire', 'Janelia FlyEM', 'BANC', 'DANDI', 'ADNI', 'SEC EDGAR', 'PostgreSQL', 'pgvector'],
-  Languages: ['English (C1)'],
+  Programming: ['Python', 'C, C++, Java (basic)', 'MATLAB'],
+  'ML and data': ['scikit-learn', 'Flower (federated learning)', 'NumPy', 'pandas', 'Google Colab'],
+  Tools: ['Flask', 'LaTeX', 'Git and GitHub', 'Microsoft Office'],
+  Other: ['Prompt engineering for code generation', 'Planning and documentation', 'Teamwork'],
 };
+
+export const languages = [
+  { skill: 'Bengali', level: 'Native' },
+  { skill: 'English listening', level: 'C1' },
+  { skill: 'English reading', level: 'C1' },
+  { skill: 'English spoken production', level: 'B2' },
+  { skill: 'English spoken interaction', level: 'C1' },
+  { skill: 'English writing', level: 'C1' },
+];
