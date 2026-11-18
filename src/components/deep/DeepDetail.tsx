@@ -18,7 +18,7 @@ function OriginalContent({ project, field }: {project: ProjectDetail; field: Sec
 
 export function DeepDetail({ project, content, previous, next }: {project: ProjectDetail; content: DeepProject; previous?: ProjectDetail; next?: ProjectDetail}) {
   const primary = project.links.find(link => link.kind === 'paper') ?? project.links.find(link => link.kind === 'demo') ?? project.links[0];
-  const sections = content.sections.map((section, index) => ({...section, number: String(index + 1).padStart(2,'0')}));
+  const sections = content.sections.filter(section => !section.verify).map((section, index) => ({...section, number: String(index + 1).padStart(2,'0')}));
   const links = primary ? [primary, ...project.links.filter(link => link !== primary)] : [];
   return <article className="mx-auto min-w-0 max-w-[1280px] space-y-7">
     <nav aria-label="Breadcrumb" className="flex flex-wrap items-center justify-between gap-2 text-sm">

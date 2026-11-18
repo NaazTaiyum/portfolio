@@ -60,7 +60,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
         <div>
           <Link to="/" className="font-heading text-headline-md text-ink">{person.name}</Link>
           <div className="font-mono text-xs text-muted">Cumilla · ICT &amp; Machine Learning</div>
-          <p className="mt-1 w-fit rounded-full bg-tint px-2 py-0.5 text-xs font-semibold text-primary">{person.tagline}</p>
+          <p className="mt-1 w-fit rounded-full border border-teal/40 bg-card px-2 py-0.5 text-xs font-semibold text-teal">{person.tagline}</p>
         </div>
         <nav aria-label="Main" className="hidden gap-5 text-sm xl:flex">{links}</nav>
         <div className="flex items-center gap-2">
@@ -88,7 +88,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
             <a href={person.links.github}>GitHub</a>
             <a href={person.links.arxiv}>arXiv</a><a href={email}>Email</a>{cv && <a href={cv}>CV PDF</a>}
           </div>
-          <p className="mt-4 font-mono text-xs text-muted">© 2026 {person.name} · Code MIT</p>
+          <p className="mt-4 font-mono text-xs text-muted">© 2026 {person.name}</p>
         </div>
       </div>
     </footer>

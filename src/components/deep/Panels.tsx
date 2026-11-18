@@ -1,4 +1,4 @@
-import { Activity, ArrowDown, ArrowRight, ArrowUpRight, CheckCircle2, Circle, Clock, Cpu, Files, Layers, Shield, Sparkles, Target, TriangleAlert } from 'lucide-react';
+import { Activity, ArrowDown, ArrowUpRight, CheckCircle2, Circle, Clock, Cpu, Files, Layers, Lock, Shield, Sparkles, Target, TriangleAlert } from 'lucide-react';
 import type { ReactNode } from 'react';
 import type { Block, DeepProject, IconName, Metric, Note, Step, Tone } from '../../data/deep';
 import type { ProjectDetail } from '../../data/projects';
@@ -134,11 +134,13 @@ export function Funnel({ title, stages }: Extract<Block, {kind: 'funnel'}>) {
   </div>;
 }
 
-export function PipelineDiagram({ title, stages, branches, examples }: Extract<Block, {kind: 'flow'}>) {
-  return <div className={panel + ' space-y-3 p-4'}><p className={label}>{title}</p>
-    <ol className="grid gap-2 sm:grid-flow-col sm:auto-cols-fr">{stages.map((stage, index) => <li key={stage} className="flex items-center gap-2 rounded bg-tint p-3 text-sm">
-      <span className="flex-1">{stage}</span>{index < stages.length - 1 && <ArrowRight size={15} aria-hidden="true" className="hidden shrink-0 text-primary sm:block" />}
+export function PipelineDiagram({ title, stages, branches, examples, localData }: Extract<Block, {kind: 'flow'}>) {
+  return <div className={panel + ' min-w-0 space-y-3 p-4'}><p className={label}>{title}</p>
+    <ol className="grid gap-2">{stages.map((stage, index) => <li key={stage}>
+      <p className="rounded bg-tint px-3 py-2 text-sm">{stage}</p>
+      {index < stages.length - 1 && <ArrowDown size={15} aria-hidden="true" className="mx-auto mt-2 text-primary" />}
     </li>)}</ol>
+    {localData && <p className="flex items-center gap-2 text-sm font-semibold text-teal"><Lock size={16} aria-hidden="true" />{localData}</p>}
     {branches && <ul className="grid gap-2 sm:grid-cols-2">{branches.map((branch, index) => <li className={'rounded border border-line p-3 text-sm font-semibold ' + (index ? 'text-coral' : 'text-teal')} key={branch}>{branch}</li>)}</ul>}
     {examples && <div className="space-y-1 border-t border-line pt-3"><p className={label}>Illustrative</p>{examples.map(example => <p key={example} className="text-sm">{example}</p>)}</div>}
   </div>;

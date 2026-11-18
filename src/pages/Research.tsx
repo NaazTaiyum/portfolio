@@ -6,7 +6,7 @@ import { Interests } from './Home';
 export function ConferenceList() {
   return <Timeline>{publishedConferences.map(entry => <li key={entry.title} className="space-y-2">
     <div className="flex flex-wrap items-center gap-2">
-      <p className={label}>{entry.dates}</p><StatusPill>{entry.status}</StatusPill>
+      <p className={label}>{entry.dates}</p><StatusPill>{entry.status}{entry.status === 'Accepted' && <span className="sr-only"> for oral presentation</span>}</StatusPill>
     </div>
     <h3>{entry.title}</h3>
     <p className="text-sm text-muted">{entry.venue}</p>

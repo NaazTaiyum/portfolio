@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Button, CitationCard, Figure, ProjectCard, SectionHeading, StatTile, label, panel } from '../components/ui';
 import { cv, email } from '../components/Shell';
-import { projectBySlug, publishedConferences } from '../data/catalog';
+import { projectBySlug, publishedConferences, publishedProjects } from '../data/catalog';
 import { asset, hasAsset } from '../data/assets';
 import { home, person, publications, researchInterests } from '../data/site';
 
@@ -37,7 +37,7 @@ export default function Home() {
     <section><SectionHeading>Research questions</SectionHeading><Interests /></section>
     <section>
       <div className="flex flex-wrap justify-between gap-2"><SectionHeading>Featured work</SectionHeading><Link to="/projects">All projects →</Link></div>
-      <div className="grid gap-4 md:grid-cols-2">{home.featuredProjectSlugs.map(projectBySlug).map(project => project &&
+      <div className="grid gap-4 md:grid-cols-2">{publishedProjects.filter(project => project.featured).map(project =>
         <ProjectCard key={project.slug} project={project} variant="featured" />)}</div>
     </section>
     <section><SectionHeading>Latest preprint</SectionHeading><CitationCard publication={publications[0]} /></section>

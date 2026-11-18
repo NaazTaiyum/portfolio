@@ -16,4 +16,6 @@ node scripts/check-content.mjs
 
 Site copy lives in `src/data/site.ts` and project content lives in `src/data/projects.ts` and `src/data/deep.ts`. Content marked `verify: true` is excluded from the site. Add an approved CV as `public/Nazifa_Nabila_CV.pdf` to enable the download link.
 
+The optional benchmark figures are held in `design/pending/budgetaware-hpo/`. Move them back under `public/projects/` if the project and its deep page are confirmed for publication.
+
 The contact form requires the EmailJS settings in `.env.example`. The email link works without those settings.

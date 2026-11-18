@@ -18,7 +18,6 @@ export const home = {
     { value: '1', label: 'arXiv preprint' },
     { value: '28.1 M', label: 'records in a federated training run' },
   ],
-  featuredProjectSlugs: ['federated-ids', 'fly-connectome', 'budgetaware-hpo'],
   now: [
     'Preparing research master’s applications.',
     'Extending my federated IDS with a proper multi-class evaluation and privacy protections.',
