@@ -10,6 +10,7 @@ export type SectionKey = 'question' | 'why' | 'approach' | 'findings' | 'limits'
 
 export type Block =
   | {kind: 'table'; title: string; headers: string[]; rows: Row[]; caption?: string}
+  | {kind: 'containment'; title: string; headers: string[]; rows: {label: string; values: number[]; containment: boolean[]}[]}
   | {kind: 'heatmap'; title: string; headers: number[]; rows: {label: string; values: number[]}[]; highlight: number; caption: string}
   | {kind: 'notes' | 'features' | 'limits' | 'steps'; title?: string; items: Step[]}
   | {kind: 'list' | 'tags'; title?: string; items: string[]}
@@ -259,4 +260,152 @@ deepProjects['federated-ids'] = {
     }]},
   ],
   provenance: 'The server, client and evaluation logs document the recorded run. The samples counted once per client are 11,058,863; 4,779,909; 4,440,789; 3,452,392; and 4,375,469.',
+};
+
+deepProjects['physics-residual-aqa'] = {
+  badges: ['ISRC 2026', 'Negative result, reported as such'],
+  metrics: [
+    {label: 'Precision needed', value: '≈3 px', caption: 'Per-coordinate noise in the synthetic experiment', chip: 'Synthetic requirement', tone: 'teal', icon: 'target'},
+    {label: 'Best model median', value: '9.48 px', caption: 'NSAQA, fine-tuned on diving', chip: '3.2× the requirement', tone: 'primary', icon: 'activity'},
+    {label: 'p90 after fine-tuning', value: '−57%', caption: 'Reduction relative to generic ViTPose', chip: '78.97 → 33.99 px', tone: 'coral', icon: 'spark'},
+    {label: 'Human self-disagreement', value: '7.8 px', caption: 'Same annotator, relabelled footage', chip: '47 paired points, 6 frames', tone: 'neutral', icon: 'layers'},
+  ],
+  artifact: {title: 'Pose precision and the verification gap', eyebrow: 'Analytical gauge', blocks: [{
+    kind: 'gauge', title: 'Synthetic requirement and observed errors', max: 20, zone: 3,
+    markers: [{label: 'ViTPose', value: 9.87, tone: 'primary'}, {label: 'RTMPose', value: 10.29, tone: 'neutral'}, {label: 'NSAQA', value: 9.48, tone: 'coral'}],
+    reference: {label: 'Human self-disagreement', value: 7.8, tone: 'neutral'}, gapTo: 9.48,
+    models: ['ViTPose', 'RTMPose', 'NSAQA'],
+    phases: [
+      {label: 'Takeoff', values: [7.86, 8.05, 7.73], n: 111}, {label: 'Early', values: [7.87, 8.71, 8.04], n: 100},
+      {label: 'Peak', values: [10.38, 10.41, 8.74], n: 79}, {label: 'Rotation 1', values: [14.14, 14.57, 11.85], n: 115},
+      {label: 'Rotation 2', values: [17.24, 22.06, 18.50], n: 35},
+    ],
+    caption: 'Error is worst exactly where the physics check is needed.',
+  }]},
+  sections: [
+    {id: 'question', title: 'The question', base: ['question'], blocks: [
+      {kind: 'equation', title: 'Invariant conservation bounds', equations: ['y(t) = y₀ + v₀t − ½gt²', 'dL/dt = 0'],
+        text: 'Exact under the stated assumptions; monocular centre-of-mass and inertia estimates are approximations, so a violation implicates the pose/camera/measurement model, not the athlete.'},
+    ]},
+    {id: 'importance', title: 'Why it matters', base: ['why'], blocks: []},
+    {id: 'approach', title: 'What we did', blocks: [{kind: 'steps', items: [
+      {title: 'Clip extraction', tools: ['ffmpeg', 'MTL-AQA annotations'], body: 'Cut dive clips from broadcast video using MTL-AQA annotations.'},
+      {title: 'Hand labelling', tools: ['Manual'], body: 'Labelled 160 frames across takeoff, early flight, peak, two rotation phases and entry; 81 had a labelled shoulder and hip.'},
+      {title: 'Synthetic requirement', tools: ['NumPy', 'Seeded'], body: '6 noise levels × 4 break sizes × 100 trials on a 100 px torso.'},
+      {title: 'Benchmark and residuals', tools: ['ViTPose', 'RTMPose', 'NSAQA'], body: 'Compared per-joint error against the hand labels phase by phase and against the synthetic threshold.'},
+    ]}]},
+    {id: 'findings', title: 'What we found', blocks: [
+      {kind: 'heatmap', title: 'Synthetic detection rates', headers: [1, 2, 3, 5, 8, 10], highlight: 3,
+        rows: [
+          {label: '5%', values: [84, 30, 15, 10, 4, 4]}, {label: '10%', values: [100, 85, 46, 17, 11, 10]},
+          {label: '20%', values: [100, 100, 98, 57, 24, 15]}, {label: '40%', values: [100, 100, 100, 100, 70, 51]},
+        ], caption: 'Known-frame detection. 100 seeded trials per cell.'},
+      {kind: 'table', title: 'Pose benchmark', headers: ['Model', 'Median (px)', 'p90 (px)', 'Gross failures (%)', 'Missed (%)'],
+        rows: [
+          {cells: ['ViTPose (generic)', '9.87', '78.97', '14.2', '7.9']},
+          {cells: ['RTMPose (generic)', '10.29', '69.91', '12.1', '7.9']},
+          {cells: ['NSAQA (diving-finetuned)', '9.48', '33.99', '8.4', '7.9'], tone: 'best'},
+          {cells: ['Human self-disagreement', '7.8', '—', '—', '—'], tone: 'reference'},
+          {cells: ['Synthetic requirement', '≈3', '—', '—', '—'], tone: 'bound'},
+        ], caption: '440 measured errors from 478 visible joint labels per model. A gross failure places a joint more than half a hand-labelled torso away. Synthetic noise is per-coordinate and model errors are Euclidean. The comparison is indicative.'},
+      {kind: 'notes', items: [
+        {title: 'Tail collapse', body: 'Fine-tuning cut p90 by 57% (78.97 → 33.99 px) and gross failures from 14.2% to 8.4%.', tone: 'teal'},
+        {title: 'Median floor', body: 'The median barely moved (9.87 → 9.48 px).'},
+        {title: 'Verification gap', body: 'The best median is about 3.2× the ≈3 px requirement.', tone: 'coral'},
+      ]},
+      {kind: 'ranges', title: 'Human consistency by joint', max: 22, rows: [
+        {label: 'Overall', low: 7.8, high: 7.8}, {label: 'Excluding probable left/right swaps', low: 6.5, high: 6.5},
+        {label: 'Hips', low: 20, high: 22, note: 'Worst agreement'},
+        {label: 'Shoulders, elbows, wrists and ankles', low: 7, high: 10},
+        {label: 'Head', low: 5, high: 5, note: 'Approximate'},
+      ], caption: 'Visibility decisions agreed 99%.'},
+      {kind: 'figure', index: 0}, {kind: 'figure', index: 1},
+    ]},
+    {id: 'limits', title: 'What this does not show', blocks: [{kind: 'limits', items: [
+      {title: 'Single frames', body: 'Temporal filtering might close part of the gap or suppress the signal. It was untested.'},
+      {title: 'Entry unmeasured', body: '0 of 20 entry frames had a labellable torso.'},
+      {title: 'Head excluded', body: 'The label sets use different head definitions.'},
+      {title: 'Monocular projection', body: 'Camera motion, segment-mass approximations and out-of-plane motion limit interpretation.'},
+      {title: 'No scoring claim', body: 'These experiments do not establish that residuals predict judges’ scores.'},
+    ]}]},
+    {id: 'reproduce', title: 'Reproduce it', blocks: [{kind: 'terminal', file: 'Terminal', code: [
+      'git clone https://github.com/donti507/physics-residual-aqa.git',
+      'cd physics-residual-aqa',
+      'python -m venv .venv',
+      '. .venv/bin/activate',
+      'python -m pip install numpy matplotlib',
+      'python src/summarize_results.py',
+      'python src/make_figures.py --results results',
+    ].join('\n')}]},
+    {id: 'next', title: 'What’s next', base: ['next'], blocks: []},
+  ],
+  provenance: 'Frames from MTL-AQA broadcast diving clips. 160 hand-labelled PNGs; 81 had a labelled shoulder and hip; 478 visible joint labels per model.',
+  dossier: {venue: 'ISRC 2026, Dhaka University Research Society (Dec 2026)', datasets: ['MTL-AQA clips'],
+    stack: ['Python', 'NumPy', 'SciPy', 'ffmpeg', 'Matplotlib', 'ViTPose', 'RTMPose', 'NSAQA']},
+};
+
+
+const defenceMatrix = [
+  { label: 'topo_1', baseline: [-153.0, -113.0, -137.2, -107.0], randomised: [238.0, 238.0, 238.0, -107.0], baselineContains: false },
+  { label: 'topo_2', baseline: [218.0, 218.0, 218.0, -107.0], randomised: [259.0, 259.0, 259.0, -107.0], baselineContains: true },
+  { label: 'topo_3', baseline: [-139.0, -119.0, -132.2, -107.0], randomised: [248.0, 248.0, 248.0, -107.0], baselineContains: false },
+  { label: 'topo_4 (unseen)', baseline: [-149.0, -124.0, -144.4, -107.0], randomised: [238.0, 238.0, 238.0, -107.0], baselineContains: false },
+  { label: 'topo_5 (unseen)', baseline: [-141.0, -126.0, -140.0, -107.0], randomised: [259.0, 259.0, 259.0, -107.0], baselineContains: false },
+];
+const testProfiles = ['Aggressive', 'Stealthy', 'Opportunistic', 'Cloud pivot (unseen)'];
+
+deepProjects['cyber-defense-generalization'] = {
+  metrics: [
+    {label: 'Familiar attacker profiles', value: '100%', caption: 'Containment with domain randomisation, including on unseen networks', tone: 'teal', icon: 'shield'},
+    {label: 'Held-out mechanism', value: '0%', caption: 'Containment against the cloud pivot for both methods', tone: 'coral', icon: 'target'},
+    {label: 'Baseline variability', value: '172.7', caption: 'Reward standard deviation across seeds on topo_3', tone: 'neutral', icon: 'activity'},
+    {label: 'Training seeds', value: '3', caption: '20 deterministic episodes per test cell', tone: 'primary', icon: 'layers'},
+  ],
+  artifact: {title: 'Containment and reward on held-out tests', eyebrow: 'Table II · Single training run', split: true,
+    blocks: [
+      {kind: 'containment', title: 'Baseline', headers: testProfiles, rows: defenceMatrix.map(row => ({
+        label: row.label, values: row.baseline, containment: row.baseline.map((_, i) => i < 3 && row.baselineContains),
+      }))},
+      {kind: 'containment', title: 'Domain-randomised', headers: testProfiles, rows: defenceMatrix.map(row => ({
+        label: row.label, values: row.randomised, containment: row.randomised.map((_, i) => i < 3),
+      }))},
+    ],
+  },
+  sections: [
+    {id: 'question', title: 'The question', base: ['question'], blocks: []},
+    {id: 'importance', title: 'Why it matters', base: ['why'], blocks: []},
+    {id: 'approach', title: 'What we did', blocks: [
+      {kind: 'steps', items: [
+        {title: 'Two cooperating defenders', tools: ['Independent PPO', 'Stable-Baselines3'], body: 'A Detector flags nodes and a Responder re-images them. We trained the defenders in Microsoft CyberBattleSim in 50-step episodes against a scripted opponent.'},
+        {title: 'Domain randomisation', tools: ['Procedural topologies'], body: 'Each training episode sampled a tree network with 7–10 nodes and one of three attacker profiles: aggressive, stealthy or opportunistic.'},
+        {title: 'Matched baseline', body: 'We trained the same defenders on a fixed, hand-built network with seven nodes.'},
+        {title: 'Held-out tests', body: 'We held out two networks and one attack mechanism. The multi-seed comparison used three training seeds, with 20 deterministic episodes per test cell.'},
+      ]},
+      {kind: 'figure', index: 0},
+    ]},
+    {id: 'findings', title: 'What we found', blocks: [
+      {kind: 'list', items: [
+        'The domain-randomised defenders contained every familiar attacker profile, including on both held-out networks.',
+        'The baseline varied substantially across seeds. Its single-run success on topo_2 did not repeat across the three comparison seeds.',
+        'Both defenders failed against the held-out mechanism across all five networks.',
+      ]},
+      {kind: 'figure', index: 1},
+      {kind: 'table', title: 'Across 3 seeds (aggressive attacker)', headers: ['Topology', 'Baseline', 'Domain-randomised'], caption: 'Table III. Mean episode reward ± standard deviation.', rows: [
+        {cells: ['topo_1', '-142.7 ± 14.6', '264.7 ± 9.4']},
+        {cells: ['topo_2', '-134.7 ± 9.4', '259.0 ± 0.0']},
+        {cells: ['topo_3', '-27.0 ± 172.7', '261.3 ± 9.4']},
+        {cells: ['topo_4 (unseen)', '-152.0 ± 12.8', '238.0 ± 16.3']},
+        {cells: ['topo_5 (unseen)', '-39.3 ± 166.2', '259.0 ± 0.0']},
+      ]},
+    ]},
+    {id: 'limits', title: 'Limits', blocks: [{kind: 'limits', items: [
+      {title: 'Small networks', body: 'The test networks had seven to ten simulated nodes.'},
+      {title: 'Scripted opponent', body: 'The benchmark did not test an adaptive attacker.'},
+      {title: 'One held-out mechanism', body: 'The experiment tested a single unfamiliar attack mechanism.'},
+      {title: 'Three seeds', body: 'The multi-seed comparison measures variability over three training runs.'},
+    ]}]},
+    {id: 'reproduce', title: 'Reproduce it', base: ['reproduce'], blocks: []},
+  ],
+  provenance: 'Table II reports an earlier single training run. Table III reports three training seeds against the aggressive profile. The repository documents differences between the original run and the seeded reproduction.',
+  dossier: {venue: 'IEEE ICCIT 2026 · Paper ID 648'},
 };

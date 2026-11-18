@@ -22,7 +22,7 @@ const [{ projects }, { conferences, experience }, { deepProjects }] = await Prom
 
 const prohibited = new Set([
   '1644197272', 'Uttar Bagmara', 'Kotbari', '3503', '1717671744', 'tofael@cou.ac.bd',
-  '577 758 192', 'ali.ashraf.yad01', 'qoNVckcAAAAJ', 'md-ali-ashraf-y', 'ICCIT',
+  '577 758 192', 'ali.ashraf.yad01', 'qoNVckcAAAAJ', 'md-ali-ashraf-y', 'Sole author', 'sole author',
   'ConnectomeTwin', 'ZEN_OS', 'ClimateGuard', 'Trust but Verify', 'ADNI', 'pl0844-01',
   'Wrocław · CS & NeuroAI', 'Yad_CV_Research', 'https://github.com/donti507"',
   '100% accuracy', '100.00%',
@@ -33,8 +33,11 @@ const prohibited = new Set([
     .flatMap(section => section.blocks.flatMap(block => block.kind === 'steps' ? block.items.map(item => item.body) : []))),
 ]);
 
-const formerName = 'Md Ali Ashraf Yad';
+const formerNames = ['Md Ali Ashraf Yad', 'M. A. A. Yad'];
 const allowedAttributions = [
+  'M. A. A. Yad and N. T. Nabila',
+  'Co-author with M. A. A. Yad (first author)',
+  'Co-author with M. A. A. Yad; led the statistical analysis',
   'Collaborator: Md Ali Ashraf Yad (Wrocław University of Science and Technology), first author: study design and comparison pipeline',
 ];
 
@@ -107,7 +110,7 @@ async function scan(directory) {
       }
       const withoutAttribution = allowedAttributions.reduce((remaining, attribution) =>
         remaining.replaceAll(attribution, ''), text);
-      if (withoutAttribution.includes(formerName) || builtPath.includes(formerName)) {
+      if (formerNames.some(name => withoutAttribution.includes(name) || builtPath.includes(name))) {
         failures.push(`${builtPath}: unexpected collaborator name`);
       }
     }

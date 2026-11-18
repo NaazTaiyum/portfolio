@@ -91,7 +91,7 @@ export function ProjectCard({ project, variant = 'compact', placement }: {
   return <article className={panel + ' relative flex min-w-0 flex-col gap-3 p-5 hover:border-primary/40' +
     (placement === 'lead' ? ' lg:row-span-2' : '')}>
     {!placement && artwork}
-    <div><StatusPill>{project.status} · {project.dates}</StatusPill></div>
+    <div><StatusPill>{project.status}{project.dates && ` · ${project.dates}`}</StatusPill></div>
     <div className={placement === 'support' && figure && hasAsset(figure.src) ? 'grid grid-cols-[minmax(0,7rem)_minmax(0,1fr)] items-start gap-3 [&_figure]:border-0 [&_figure]:p-0 [&_img]:aspect-square [&_img]:object-cover [&_img]:object-center' : ''}>
       {placement === 'support' && artwork}
       <div className="space-y-2">

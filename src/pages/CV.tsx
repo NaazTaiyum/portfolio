@@ -24,7 +24,7 @@ export default function CV() {
           <p className="text-sm text-muted">{item.result}</p>
           {item.coursework && <div className="mt-2"><Tags values={item.coursework} /></div>}
         </li>)}</Timeline></section>
-        <section><SectionHeading>Publications</SectionHeading><div className="space-y-3">{publications.map(publication =>
+        <section className="space-y-4"><SectionHeading>Publications</SectionHeading><ConferenceList coauthored /><div className="space-y-3">{publications.map(publication =>
           <CitationCard key={publication.title} publication={publication} compact />)}</div></section>
         <section><SectionHeading>Conference papers and talks</SectionHeading><ConferenceList /></section>
         <section><SectionHeading>Research projects</SectionHeading><ul className="divide-y divide-line border-y border-line">

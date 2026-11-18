@@ -15,7 +15,7 @@ export const home = {
   heroBody: 'I am an ICT graduate from Comilla University (CGPA 3.53/4.00). My project work covers federated learning, network intrusion detection and machine-learning experiments. I am applying to research-oriented master’s programmes to strengthen my mathematical foundations, software development and reproducible experimental methods, and to move towards medical image analysis and neuroimaging.',
   stats: [
     { value: '3.53/4.00', label: 'CGPA' },
-    { value: '1', label: 'arXiv preprint' },
+    { value: '1 IEEE paper', label: '1 preprint' },
     { value: '28.1 M', label: 'records in a federated training run' },
   ],
   now: [
@@ -60,8 +60,49 @@ export const education = [
   { school: 'Government Laboratory High School', degree: 'SSC', dates: '2016–2018', location: 'Cumilla', result: 'GPA 5.00/5.00' },
 ];
 
-// Authors: [to confirm]
-export const conferences: { title: string; venue: string; dates: string; status: 'Accepted' | 'Presented'; role?: string; now?: string; verify?: boolean }[] = [
+type Conference = {
+  title: string;
+  venue: string;
+  dates: string;
+  status: 'Accepted' | 'Presented';
+  authors?: string;
+  role?: string;
+  badge?: string;
+  note?: string;
+  code?: string;
+  project?: string;
+  now?: string;
+  verify?: boolean;
+};
+
+export const conferences: Conference[] = [
+  {
+    title: 'Structural and Attack-Mechanism Generalization in a Domain-Randomized Detector–Responder Framework for Autonomous Cyber Defense',
+    venue: '29th International Conference on Computer and Information Technology (IEEE ICCIT 2026)',
+    dates: '2026',
+    status: 'Accepted',
+    authors: 'M. A. A. Yad and N. T. Nabila',
+    role: 'Co-author',
+    badge: 'Accepted · IEEE · Oral',
+    note: 'Accepted for oral presentation. Paper ID 648. The conference used double-blind peer review with at least two reviewers and received 3,574 submissions. Registered papers are submitted to IEEE Xplore.',
+    code: 'https://github.com/donti507/domain-randomized-ippo-cyber-defense',
+    project: 'cyber-defense-generalization',
+    now: 'Preparing the IEEE ICCIT 2026 oral presentation.',
+  },
+  {
+    title: 'Physics-Residual Learning for Interpretable and Label-Efficient Diving Action Quality Assessment',
+    venue: '2nd International Student Research Conference (ISRC 2026), Dhaka University Research Society, Dhaka',
+    dates: '28 Dec 2026',
+    status: 'Accepted',
+    authors: 'M. A. A. Yad and N. T. Nabila',
+    role: 'Co-author',
+    badge: 'Accepted · Oral · Dec 2026',
+    note: 'Abstract accepted for oral presentation.',
+    code: 'https://github.com/donti507/physics-residual-aqa',
+    project: 'physics-residual-aqa',
+    now: 'Presenting our diving physics-residual paper at ISRC 2026, Dhaka University (28 Dec).',
+  },
+  // Authors of the ICSD and physics conference entries: [to confirm]
   {
     title: 'Integrating Bloom’s Taxonomy into Computer Networking Education to Promote Sustainable Development Awareness',
     venue: '8th International Conference on Sustainable Development (ICSD 2026), United International University (UIU), Dhaka',
@@ -79,14 +120,6 @@ export const conferences: { title: string; venue: string; dates: string; status:
     venue: 'International Conference on Physics 2026, Bangladesh Physics Society, Dhaka University',
     dates: '9–11 Apr 2026',
     status: 'Presented',
-  },
-  {
-    title: 'Physics-Residual Learning for Interpretable and Label-Efficient Diving Action Quality Assessment',
-    venue: '2nd International Student Research Conference (ISRC 2026), Dhaka University',
-    dates: '28 Dec 2026',
-    status: 'Accepted',
-    now: 'Preparing for ISRC 2026 at Dhaka University.',
-    verify: true,
   },
 ];
 
