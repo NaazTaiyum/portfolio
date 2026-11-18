@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Button, CitationCard, Figure, ProjectCard, SectionHeading, StatTile, label, panel } from '../components/ui';
 import { cv, email } from '../components/Shell';
-import { projectBySlug } from '../data/catalog';
+import { projectBySlug, publishedConferences } from '../data/catalog';
 import { asset, hasAsset } from '../data/assets';
 import { home, person, publications, researchInterests } from '../data/site';
 
@@ -13,6 +13,9 @@ export function Interests() {
 }
 
 export default function Home() {
+  const [cgpa, preprint, records] = home.stats;
+  const stats = [cgpa, preprint, { value: String(publishedConferences.length), label: 'conference papers and talks' }, records];
+  const now = [...home.now, ...publishedConferences.flatMap(entry => entry.now ? [entry.now] : [])];
   const figure = projectBySlug('fly-connectome')?.figures?.[0];
   const showFigure = figure && hasAsset(figure.src);
   return <div className="mx-auto max-w-[1120px] space-y-12">
@@ -30,7 +33,7 @@ export default function Home() {
       {showFigure && <Figure figure={{ ...figure, caption: 'Figure from arXiv:2610.29205' }} priority />}
       {hasAsset('portrait.jpg') && <img src={asset('portrait.jpg')} alt={person.name} className="w-full max-w-60 rounded-lg" />}
     </section>
-    <dl className="grid grid-cols-2 gap-3 md:grid-cols-4">{home.stats.map(stat => <StatTile key={stat.label} stat={stat} />)}</dl>
+    <dl className="grid grid-cols-2 gap-3 md:grid-cols-4">{stats.map(stat => <StatTile key={stat.label} stat={stat} />)}</dl>
     <section><SectionHeading>Research questions</SectionHeading><Interests /></section>
     <section>
       <div className="flex flex-wrap justify-between gap-2"><SectionHeading>Featured work</SectionHeading><Link to="/projects">All projects →</Link></div>
@@ -39,7 +42,7 @@ export default function Home() {
     </section>
     <section><SectionHeading>Latest preprint</SectionHeading><CitationCard publication={publications[0]} /></section>
     <section className={panel + ' p-5'}><SectionHeading>Now, Nov 2026</SectionHeading>
-      <ul className="list-disc space-y-2 pl-5">{home.now.map(item => <li key={item}>{item}</li>)}</ul>
+      <ul className="list-disc space-y-2 pl-5">{now.map(item => <li key={item}>{item}</li>)}</ul>
     </section>
     <section className="flex flex-wrap items-center justify-between gap-4 rounded-lg bg-tint p-5">
       <h2>Working on something related? I'd like to hear about it.</h2>

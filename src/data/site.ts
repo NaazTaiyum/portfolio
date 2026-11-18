@@ -16,7 +16,6 @@ export const home = {
   stats: [
     { value: '3.53/4.00', label: 'CGPA' },
     { value: '1', label: 'arXiv preprint' },
-    { value: '3', label: 'conference papers and talks' },
     { value: '28.1 M', label: 'records in a federated training run' },
   ],
   featuredProjectSlugs: ['federated-ids', 'fly-connectome', 'budgetaware-hpo'],
@@ -63,7 +62,7 @@ export const education = [
 ];
 
 // Authors: [to confirm]
-export const conferences: { title: string; venue: string; dates: string; status: 'Accepted' | 'Presented'; role?: string; verify?: boolean }[] = [
+export const conferences: { title: string; venue: string; dates: string; status: 'Accepted' | 'Presented'; role?: string; now?: string; verify?: boolean }[] = [
   {
     title: 'Integrating Bloom’s Taxonomy into Computer Networking Education to Promote Sustainable Development Awareness',
     venue: '8th International Conference on Sustainable Development (ICSD 2026), United International University (UIU), Dhaka',
@@ -87,6 +86,7 @@ export const conferences: { title: string; venue: string; dates: string; status:
     venue: '2nd International Student Research Conference (ISRC 2026), Dhaka University',
     dates: '28 Dec 2026',
     status: 'Accepted',
+    now: 'Preparing for ISRC 2026 at Dhaka University.',
     verify: true,
   },
 ];
