@@ -57,6 +57,12 @@ export default function Contact() {
         <li><a className="flex items-center gap-2 py-3" href={person.links.github}>
           <Github size={17} aria-hidden="true" />GitHub<ArrowUpRight className="ml-auto" size={17} aria-hidden="true" />
         </a></li>
+        <li><a className="flex items-center gap-2 py-3" href={person.links.researchGate}>
+          ResearchGate<ArrowUpRight className="ml-auto" size={17} aria-hidden="true" />
+        </a></li>
+        <li><a className="flex items-center gap-2 py-3" href={person.links.linkedin}>
+          LinkedIn<ArrowUpRight className="ml-auto" size={17} aria-hidden="true" />
+        </a></li>
       </ul>
       <p className="flex items-center gap-2 text-muted"><MapPin size={18} aria-hidden="true" />{person.location} (UTC+6)</p>
     </section>

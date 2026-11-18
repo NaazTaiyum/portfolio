@@ -5,6 +5,8 @@ export const person = {
   email: 'nabilanazifa70376@gmail.com',
   links: {
     github: 'https://github.com/NaazTaiyum',
+    researchGate: 'https://www.researchgate.net/profile/Nazifa-Nabila-5',
+    linkedin: 'https://www.linkedin.com/in/nazztaiyum/',
     arxiv: 'https://arxiv.org/abs/2610.29205',
     cv: 'Nazifa_Nabila_CV.pdf',
   },
