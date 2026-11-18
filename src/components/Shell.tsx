@@ -86,6 +86,8 @@ export function Shell({ children }: { children: React.ReactNode }) {
         <div className="md:text-right">
           <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm md:justify-end">
             <a href={person.links.github}>GitHub</a>
+            <a href={person.links.researchGate}>ResearchGate</a>
+            <a href={person.links.linkedin}>LinkedIn</a>
             <a href={person.links.arxiv}>arXiv</a><a href={email}>Email</a>{cv && <a href={cv}>CV PDF</a>}
           </div>
           <p className="mt-4 font-mono text-xs text-muted">© 2026 {person.name}</p>
