@@ -5,10 +5,9 @@ import { projectBySlug } from '../data/catalog';
 import { asset, hasAsset } from '../data/assets';
 import { home, person, publications, researchInterests } from '../data/site';
 
-const interestSlugs = ['fly-connectome', 'adni-brain-age', 'budgetaware-hpo', 'trust-but-verify'];
 export function Interests() {
-  return <div className="grid gap-4 sm:grid-cols-2">{researchInterests.map((interest, index) => <article className={panel + ' p-5'} key={interest.title}>
-    <h3><Link to={`/projects/${interestSlugs[index]}`}>{interest.title}</Link></h3>
+  return <div className="grid gap-4 md:grid-cols-3">{researchInterests.map((interest) => <article className={panel + ' p-5'} key={interest.title}>
+    <h3>{interest.title}</h3>
     <p className="mt-2 text-muted">{interest.body}</p>
   </article>)}</div>;
 }
@@ -19,12 +18,13 @@ export default function Home() {
   return <div className="mx-auto max-w-[1120px] space-y-12">
     <section className={`grid items-start gap-7 ${showFigure ? 'md:grid-cols-[1.4fr_1fr]' : ''}`}>
       <div className="space-y-5">
-        <p className={label}>{person.name} · Wrocław</p>
+        <p className={label}>{person.name} · Cumilla</p>
         <h1 className="md:text-[42px]">{home.heroTitle}</h1>
         <p className="max-w-3xl text-muted">{home.heroBody}</p>
         <div className="flex flex-wrap gap-2">
-          <Button href={person.links.arxiv} variant="primary">Read the preprint</Button>
-          {cv && <Button href={cv}>Download CV</Button>}<Button to="/projects" variant="ghost">View projects</Button>
+          <Button to="/projects" variant="primary">View projects</Button>
+          <Button href={person.links.arxiv}>Read the preprint</Button>
+          {cv && <Button href={cv}>Download CV</Button>}
         </div>
       </div>
       {showFigure && <Figure figure={{ ...figure, caption: 'Figure from arXiv:2610.29205' }} priority />}
@@ -34,7 +34,7 @@ export default function Home() {
     <section><SectionHeading>Research questions</SectionHeading><Interests /></section>
     <section>
       <div className="flex flex-wrap justify-between gap-2"><SectionHeading>Featured work</SectionHeading><Link to="/projects">All projects →</Link></div>
-      <div className="grid gap-4 md:grid-cols-3">{home.featuredProjectSlugs.map(projectBySlug).map(project => project &&
+      <div className="grid gap-4 md:grid-cols-2">{home.featuredProjectSlugs.map(projectBySlug).map(project => project &&
         <ProjectCard key={project.slug} project={project} variant="featured" />)}</div>
     </section>
     <section><SectionHeading>Latest preprint</SectionHeading><CitationCard publication={publications[0]} /></section>

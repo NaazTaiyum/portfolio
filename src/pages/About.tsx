@@ -7,7 +7,7 @@ import { PhotoImage } from '../components/PhotoImage';
 
 export function Experience() {
   return <Timeline>{publishedExperience.map(entry => <li key={entry.role} className="space-y-1">
-    <p className={label}>{entry.dates} · {entry.type}</p><h3>{entry.role}</h3><p className="text-sm text-muted">{entry.org}</p>
+    <p className={label}>{entry.dates}</p><h3>{entry.role}</h3><p className="text-sm text-muted">{entry.org}</p>
     <ul className="list-disc space-y-1 pl-5">{entry.points.map(point => <li key={point}>{point}</li>)}</ul>
   </li>)}</Timeline>;
 }

@@ -54,7 +54,7 @@ export default function Contact() {
         <CopyButton value={person.email} text="Copy email" />
       </div>
       <ul className={panel + ' divide-y divide-line px-4'}>
-        {([['GitHub', person.links.github], ['Google Scholar', person.links.scholar], ['LinkedIn', person.links.linkedin], ['arXiv', person.links.arxiv]] as const).map(([name, href]) =>
+        {([['GitHub', person.links.github], ['arXiv', person.links.arxiv]] as const).map(([name, href]) =>
           <li key={name}><a className="flex items-center gap-2 py-3" href={href}>
             {name === 'GitHub' && <Github size={17} aria-hidden="true" />}{name}<ArrowUpRight className="ml-auto" size={17} aria-hidden="true" />
           </a></li>)}
